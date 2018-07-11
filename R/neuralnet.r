@@ -1,4 +1,129 @@
-#' @export
+#' Training of neural networks
+#' 
+#' \code{neuralnet} is used to train neural networks using backpropagation,
+#' resilient backpropagation (RPROP) with (Riedmiller, 1994) or without weight
+#' backtracking (Riedmiller and Braun, 1993) or the modified globally
+#' convergent version (GRPROP) by Anastasiadis et al. (2005). The function
+#' allows flexible settings through custom-choice of error and activation
+#' function. Furthermore the calculation of generalized weights (Intrator O.
+#' and Intrator N., 1993) is implemented.
+#' 
+#' The globally convergent algorithm is based on the resilient backpropagation
+#' without weight backtracking and additionally modifies one learning rate,
+#' either the learningrate associated with the smallest absolute gradient (sag)
+#' or the smallest learningrate (slr) itself. The learning rates in the grprop
+#' algorithm are limited to the boundaries defined in learningrate.limit.
+#' 
+#' @aliases neuralnet print.nn
+#' @param formula a symbolic description of the model to be fitted.
+#' @param data a data frame containing the variables specified in
+#' \code{formula}.
+#' @param hidden a vector of integers specifying the number of hidden neurons
+#' (vertices) in each layer.
+#' @param threshold a numeric value specifying the threshold for the partial
+#' derivatives of the error function as stopping criteria.
+#' @param stepmax the maximum steps for the training of the neural network.
+#' Reaching this maximum leads to a stop of the neural network's training
+#' process.
+#' @param rep the number of repetitions for the neural network's training.
+#' @param startweights a vector containing starting values for the weights. The
+#' weights will not be randomly initialized.
+#' @param learningrate.limit a vector or a list containing the lowest and
+#' highest limit for the learning rate. Used only for RPROP and GRPROP.
+#' @param learningrate.factor a vector or a list containing the multiplication
+#' factors for the upper and lower learning rate. Used only for RPROP and
+#' GRPROP.
+#' @param learningrate a numeric value specifying the learning rate used by
+#' traditional backpropagation. Used only for traditional backpropagation.
+#' @param lifesign a string specifying how much the function will print during
+#' the calculation of the neural network. 'none', 'minimal' or 'full'.
+#' @param lifesign.step an integer specifying the stepsize to print the minimal
+#' threshold in full lifesign mode.
+#' @param algorithm a string containing the algorithm type to calculate the
+#' neural network. The following types are possible: 'backprop', 'rprop+',
+#' 'rprop-', 'sag', or 'slr'. 'backprop' refers to backpropagation, 'rprop+'
+#' and 'rprop-' refer to the resilient backpropagation with and without weight
+#' backtracking, while 'sag' and 'slr' induce the usage of the modified
+#' globally convergent algorithm (grprop). See Details for more information.
+#' @param err.fct a differentiable function that is used for the calculation of
+#' the error. Alternatively, the strings 'sse' and 'ce' which stand for the sum
+#' of squared errors and the cross-entropy can be used.
+#' @param act.fct a differentiable function that is used for smoothing the
+#' result of the cross product of the covariate or neurons and the weights.
+#' Additionally the strings, 'logistic' and 'tanh' are possible for the
+#' logistic function and tangent hyperbolicus.
+#' @param linear.output logical. If act.fct should not be applied to the output
+#' neurons set linear output to TRUE, otherwise to FALSE.
+#' @param exclude a vector or a matrix specifying the weights, that are
+#' excluded from the calculation. If given as a vector, the exact positions of
+#' the weights must be known. A matrix with n-rows and 3 columns will exclude n
+#' weights, where the first column stands for the layer, the second column for
+#' the input neuron and the third column for the output neuron of the weight.
+#' @param constant.weights a vector specifying the values of the weights that
+#' are excluded from the training process and treated as fix.
+#' @param likelihood logical. If the error function is equal to the negative
+#' log-likelihood function, the information criteria AIC and BIC will be
+#' calculated. Furthermore the usage of confidence.interval is meaningfull.
+#' @return \code{neuralnet} returns an object of class \code{nn}.  An object of
+#' class \code{nn} is a list containing at most the following components:
+#' 
+#' \item{ call }{ the matched call. } \item{ response }{ extracted from the
+#' \code{data argument}.  } \item{ covariate }{ the variables extracted from
+#' the \code{data argument}. } \item{ model.list }{ a list containing the
+#' covariates and the response variables extracted from the \code{formula
+#' argument}. } \item{ err.fct }{ the error function. } \item{ act.fct }{ the
+#' activation function. } \item{ data }{ the \code{data argument}.} \item{
+#' net.result }{ a list containing the overall result of the neural network for
+#' every repetition.} \item{ weights }{ a list containing the fitted weights of
+#' the neural network for every repetition. } \item{ generalized.weights }{ a
+#' list containing the generalized weights of the neural network for every
+#' repetition. } \item{ result.matrix }{ a matrix containing the reached
+#' threshold, needed steps, error, AIC and BIC (if computed) and weights for
+#' every repetition. Each column represents one repetition. } \item{
+#' startweights }{ a list containing the startweights of the neural network for
+#' every repetition. }
+#' @author Stefan Fritsch, Frauke Guenther \email{guenther@@leibniz-bips.de}
+#' @seealso \code{\link{plot.nn}} for plotting the neural network.
+#' 
+#' \code{\link{gwplot}} for plotting the generalized weights.
+#' 
+#' \code{\link{compute}} for computation of a given neural network for given
+#' covariate vectors.
+#' 
+#' \code{\link{confidence.interval}} for calculation of confidence intervals of
+#' the weights.
+#' 
+#' \code{\link{prediction}} for a summary of the output of the neural network.
+#' @references Riedmiller M. (1994) \emph{Rprop - Description and
+#' Implementation Details.} Technical Report. University of Karlsruhe.
+#' 
+#' Riedmiller M. and Braun H. (1993) \emph{A direct adaptive method for faster
+#' backpropagation learning: The RPROP algorithm.} Proceedings of the IEEE
+#' International Conference on Neural Networks (ICNN), pages 586-591.  San
+#' Francisco.
+#' 
+#' Anastasiadis A. et. al. (2005) \emph{New globally convergent training scheme
+#' based on the resilient propagation algorithm.} Neurocomputing 64, pages
+#' 253-270.
+#' 
+#' Intrator O. and Intrator N. (1993) \emph{Using Neural Nets for
+#' Interpretation of Nonlinear Models.} Proceedings of the Statistical
+#' Computing Section, 244-249 San Francisco: American Statistical Society
+#' (eds).
+#' @keywords neural
+#' @examples
+#' 
+#' AND <- c(rep(0,7),1)
+#' OR <- c(0,rep(1,7))
+#' binary.data <- data.frame(expand.grid(c(0,1), c(0,1), c(0,1)), AND, OR)
+#' print(net <- neuralnet(AND+OR~Var1+Var2+Var3,  binary.data, hidden=0, 
+#'              rep=10, err.fct="ce", linear.output=FALSE))
+#' 
+#' data(infert, package="datasets")
+#' print(net.infert <- neuralnet(case~parity+induced+spontaneous, infert, 
+#'                     err.fct="ce", linear.output=FALSE, likelihood=TRUE))
+#' 
+#' @export neuralnet
 neuralnet <-
 function (formula, data, hidden = 1, threshold = 0.01, stepmax = 1e+05, 
     rep = 1, startweights = NULL, learningrate.limit = NULL, 

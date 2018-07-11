@@ -1,4 +1,52 @@
-#' @export
+#' Plot method for neural networks
+#' 
+#' \code{plot.nn}, a method for the \code{plot} generic. It is designed for an
+#' inspection of the weights for objects of class \code{nn}, typically produced
+#' by \code{neuralnet}.
+#' 
+#' 
+#' @param x an object of class \code{nn}
+#' @param rep repetition of the neural network. If rep="best", the repetition
+#' with the smallest error will be plotted. If not stated all repetitions will
+#' be plotted, each in a separate window.
+#' @param x.entry x-coordinate of the entry layer. Depends on the arrow.length
+#' in default.
+#' @param x.out x-coordinate of the output layer.
+#' @param radius radius of the neurons.
+#' @param arrow.length length of the entry and out arrows.
+#' @param intercept a logical value indicating whether to plot the intercept.
+#' @param intercept.factor x-position factor of the intercept. The closer the
+#' factor is to 0, the closer the intercept is to its left neuron.
+#' @param information a logical value indicating whether to add the error and
+#' steps to the plot.
+#' @param information.pos y-position of the information.
+#' @param col.entry.synapse color of the synapses leading to the input neurons.
+#' @param col.entry color of the input neurons.
+#' @param col.hidden color of the neurons in the hidden layer.
+#' @param col.hidden.synapse color of the weighted synapses.
+#' @param col.out color of the output neurons.
+#' @param col.out.synapse color of the synapses leading away from the output
+#' neurons.
+#' @param col.intercept color of the intercept.
+#' @param fontsize fontsize of the text.
+#' @param dimension size of the plot in inches.
+#' @param show.weights a logical value indicating whether to print the
+#' calculated weights above the synapses.
+#' @param file a character string naming the plot to write to. If not stated,
+#' the plot will not be saved.
+#' @param \dots arguments to be passed to methods, such as graphical parameters
+#' (see \code{\link{par}}).
+#' @author Stefan Fritsch, Frauke Guenther \email{guenther@@leibniz-bips.de}
+#' @seealso \code{\link{neuralnet}}
+#' @keywords neural
+#' @examples
+#' 
+#' XOR <- c(0,1,1,0)
+#' xor.data <- data.frame(expand.grid(c(0,1), c(0,1)), XOR)
+#' print(net.xor <- neuralnet( XOR~Var1+Var2, xor.data, hidden=2, rep=5))
+#' plot(net.xor, rep="best")
+#' 
+#' @S3method plot nn
 plot.nn <-
 function (x, rep = NULL, x.entry = NULL, x.out = NULL, radius = 0.15, 
     arrow.length = 0.2, intercept = TRUE, intercept.factor = 0.4, 
