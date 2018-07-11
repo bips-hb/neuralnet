@@ -20,3 +20,6 @@ Description: Training of neural networks using backpropagation,
     the calculation of generalized weights (Intrator O & Intrator
     N, 1993) is implemented.
 License: GPL (>= 2)
+Suggests: testthat
+URL: https://github.com/bips-hb/neuralnet
+BugReports: https://github.com/bips-hb/neuralnet/issues
