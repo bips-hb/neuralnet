@@ -1,7 +1,7 @@
 library(neuralnet)
 context("neuralnet")
 
-nn <- neuralnet(Species == "setosa" ~ Petal.Length + Petal.Width, iris)
+nn <- neuralnet(Species == "setosa" ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
 pred <- compute(nn, iris[, c("Petal.Length", "Petal.Width")])
 
 test_that("Fitting returns nn object with correct size", {
@@ -16,6 +16,6 @@ test_that("Prediction returns list with correct size", {
 })
 
 test_that("Prediction is about right", {
-  expect_true(all(abs(pred$net.result[, 1] - (iris$Species == "setosa")) <= .1))
+  expect_true(mean(abs(pred$net.result[, 1] - (iris$Species == "setosa"))) <= .1)
 })
 
