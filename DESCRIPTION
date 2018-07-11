@@ -1,15 +1,14 @@
 Package: neuralnet
 Type: Package
 Title: Training of Neural Networks
-Version: 1.33
-Date: 2016-08-05
+Version: 1.4.0
+Date: 2018-07-11
 Authors@R: c(
-    person(given="Stefan", family="Fritsch",  role="aut"), 
-    person(given="Frauke", family="Guenther", role=c("aut","cre"),email="guenther@leibniz-bips.de"),
-    person(given="Marc",   family="Suling",   role="ctb"),	
-    person(given="Sebastian M.", family="Mueller", email="smm@posteo.org", role = "ctb"))
-Author: Stefan Fritsch [aut], Frauke Guenther [aut, cre], Marc Suling [ctb], Sebastian M. Mueller [ctb]
-Maintainer: Frauke Guenther <guenther@leibniz-bips.de>
+    person(given="Stefan", family="Fritsch", role="aut"), 
+    person(given="Frauke", family="Guenther", role=c("aut")),
+    person(given="Marvin N.", family="Wright", role=c("aut","cre"),email="wright@leibniz-bips.de"),
+    person(given="Marc", family="Suling", role="ctb"),	
+    person(given="Sebastian M.", family="Mueller", role = "ctb"))
 Depends: R (>= 2.9.0)
 Imports: grid, MASS, grDevices, stats, utils
 Description: Training of neural networks using backpropagation,
