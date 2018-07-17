@@ -16,5 +16,6 @@
 #' @export
 compute <- function(x, covariate, rep = 1) {
   .Deprecated("predict", package = "neuralnet")
-  predict.nn(x, newdata = covariate, rep = rep)
+  pred <- predict.nn(x, newdata = covariate, rep = rep)
+  list(neurons = "Use predict() for unit prediction.", net.result = pred)
 }
