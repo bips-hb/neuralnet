@@ -17,6 +17,7 @@ test_that("Prediction returns numeric with correct size", {
 })
 
 test_that("Prediction is about right", {
+  set.seed(100)
   expect_true(mean(abs(pred[, 1] - (iris$Species == "setosa"))) <= .1)
 })
 
