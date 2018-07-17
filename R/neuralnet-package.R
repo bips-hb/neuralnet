@@ -68,7 +68,7 @@
 #' sqrt.data <- data.frame(Var1, Sqrt=sqrt(Var1))
 #' print(net.sqrt <- neuralnet(Sqrt~Var1, sqrt.data, hidden=10, 
 #'                   threshold=0.01))
-#' compute(net.sqrt, (1:10)^2)$net.result
+#' predict(net.sqrt, data.frame(Var1 = (1:10)^2))
 #' 
 #' Var1 <- rpois(100,0.5)
 #' Var2 <- rbinom(100,2,0.6)

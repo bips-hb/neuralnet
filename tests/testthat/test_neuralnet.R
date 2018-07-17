@@ -20,28 +20,12 @@ test_that("Prediction is about right", {
   expect_true(mean(abs(pred[, 1] - (iris$Species == "setosa"))) <= .1)
 })
 
-test_that("predict() function returns the same as compute() function", {
-  pred_compute <- compute(nn, iris[, c("Petal.Length", "Petal.Width")])
-  expect_equal(pred, pred_compute$net.result)
-  
-  pred_compute <- compute(nn2, iris[, c("Petal.Length", "Petal.Width")])
-  expect_equal(pred2, pred_compute$net.result)
-})
+test_that("predict() function returns list of correct size for unit prediction", {
+  pred_all <- predict(nn, iris[, c("Petal.Length", "Petal.Width")], all.units = TRUE)
+  expect_equal(length(pred_all), 3)
 
-test_that("predict() function returns the same as compute() function for unit prediction", {
-  pred_compute <- compute(nn, iris[, c("Petal.Length", "Petal.Width")])
-  pred_predict <- predict(nn, iris[, c("Petal.Length", "Petal.Width")], all.units = TRUE)
-  for (i in 1:length(nn$weights[[1]])) {
-    expect_equal(pred_predict[[i]], pred_compute$neurons[[i]][, -1, drop = FALSE])
-  }
-  expect_equal(pred_predict[[length(nn$weights[[1]]) + 1]], pred_compute$net.result)
-  
-  pred_compute <- compute(nn2, iris[, c("Petal.Length", "Petal.Width")])
-  pred_predict <- predict(nn2, iris[, c("Petal.Length", "Petal.Width")], all.units = TRUE)
-  for (i in 1:length(nn2$weights[[1]])) {
-    expect_equal(pred_predict[[i]], pred_compute$neurons[[i]][, -1, drop = FALSE])
-  }
-  expect_equal(pred_predict[[length(nn2$weights[[1]]) + 1]], pred_compute$net.result)
+  pred_all2 <- predict(nn2, iris[, c("Petal.Length", "Petal.Width")], all.units = TRUE)
+  expect_equal(length(pred_all2), 4)
 })
 
 test_that("Multiclass returns correct dimensions", {
