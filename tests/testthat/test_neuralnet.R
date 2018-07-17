@@ -28,6 +28,22 @@ test_that("predict() function returns the same as compute() function", {
   expect_equal(pred2, pred_compute$net.result)
 })
 
+test_that("predict() function returns the same as compute() function for unit prediction", {
+  pred_compute <- compute(nn, iris[, c("Petal.Length", "Petal.Width")])
+  pred_predict <- predict(nn, iris[, c("Petal.Length", "Petal.Width")], all.units = TRUE)
+  for (i in 1:length(nn$weights[[1]])) {
+    expect_equal(pred_predict[[i]], pred_compute$neurons[[i]][, -1, drop = FALSE])
+  }
+  expect_equal(pred_predict[[length(nn$weights[[1]]) + 1]], pred_compute$net.result)
+  
+  pred_compute <- compute(nn2, iris[, c("Petal.Length", "Petal.Width")])
+  pred_predict <- predict(nn2, iris[, c("Petal.Length", "Petal.Width")], all.units = TRUE)
+  for (i in 1:length(nn2$weights[[1]])) {
+    expect_equal(pred_predict[[i]], pred_compute$neurons[[i]][, -1, drop = FALSE])
+  }
+  expect_equal(pred_predict[[length(nn2$weights[[1]]) + 1]], pred_compute$net.result)
+})
+
 test_that("Multiclass returns correct dimensions", {
   nn_multi <- neuralnet((Species == "setosa") + (Species == "versicolor") ~ Petal.Length + Petal.Width, iris, 
                         hidden = c(2, 3), linear.output = FALSE)

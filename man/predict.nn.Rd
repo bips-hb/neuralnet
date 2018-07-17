@@ -4,7 +4,7 @@
 \alias{predict.nn}
 \title{Neural network prediction}
 \usage{
-\method{predict}{nn}(object, newdata, rep = 1, ...)
+\method{predict}{nn}(object, newdata, rep = 1, all.units = FALSE, ...)
 }
 \arguments{
 \item{object}{Neural network of class \code{nn}.}
@@ -13,10 +13,13 @@
 
 \item{rep}{Integer indicating the neural network's repetition which should be used.}
 
+\item{all.units}{Return output for all units instead of final output only.}
+
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-Matrix of predictions. Each column represents one output unit.
+Matrix of predictions. Each column represents one output unit. 
+If \code{all.units=TRUE}, a list of matrices with output for each unit.
 }
 \description{
 Prediction of artificial neural network of class \code{nn}, produced by \code{neuralnet()}.

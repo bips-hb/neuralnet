@@ -6,9 +6,11 @@
 #' @param object Neural network of class \code{nn}.
 #' @param newdata New data of class \code{data.frame} or \code{matrix}. 
 #' @param rep Integer indicating the neural network's repetition which should be used.
+#' @param all.units Return output for all units instead of final output only.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return Matrix of predictions. Each column represents one output unit. 
+#' If \code{all.units=TRUE}, a list of matrices with output for each unit.
 #'
 #' @examples
 #' library(neuralnet)
@@ -31,17 +33,27 @@
 #' 
 #' @author Marvin N. Wright
 #' @export
-predict.nn <- function(object, newdata, rep = 1, ...) {
+predict.nn <- function(object, newdata, rep = 1, all.units = FALSE, ...) {
   weights <- object$weights[[rep]]
   num_hidden_layers <- length(weights) - 1
   
   # Init prediction with data, subset if necessary
   pred <- as.matrix(newdata[, object$model.list$variables])
   
+  # Init units if requested
+  if (all.units) {
+    units <- list(pred)
+  }
+  
   # Hidden layers
   if (num_hidden_layers > 0) {
     for (i in 1:num_hidden_layers) {
       pred <- object$act.fct(cbind(1, pred) %*% weights[[i]])
+      
+      # Save unit outputs if requested
+      if (all.units) {
+        units <- append(units, list(pred))
+      }
     }
   }
   
@@ -51,7 +63,16 @@ predict.nn <- function(object, newdata, rep = 1, ...) {
     pred <- object$act.fct(pred)
   }
   
+  # Save unit outputs if requested
+  if (all.units) {
+    units <- append(units, list(pred))
+  } 
+  
   # Return result
-  pred
+  if (all.units) {
+    units
+  } else {
+    pred
+  }
 }
   
