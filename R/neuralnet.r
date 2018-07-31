@@ -1,11 +1,11 @@
 #' Training of neural networks
 #' 
-#' \code{neuralnet} is used to train neural networks using backpropagation,
+#' Train neural networks using backpropagation,
 #' resilient backpropagation (RPROP) with (Riedmiller, 1994) or without weight
 #' backtracking (Riedmiller and Braun, 1993) or the modified globally
 #' convergent version (GRPROP) by Anastasiadis et al. (2005). The function
 #' allows flexible settings through custom-choice of error and activation
-#' function. Furthermore the calculation of generalized weights (Intrator O.
+#' function. Furthermore, the calculation of generalized weights (Intrator O.
 #' and Intrator N., 1993) is implemented.
 #' 
 #' The globally convergent algorithm is based on the resilient backpropagation
@@ -26,8 +26,8 @@
 #' Reaching this maximum leads to a stop of the neural network's training
 #' process.
 #' @param rep the number of repetitions for the neural network's training.
-#' @param startweights a vector containing starting values for the weights. The
-#' weights will not be randomly initialized.
+#' @param startweights a vector containing starting values for the weights. 
+#' Set to \code{NULL} for random initialization. 
 #' @param learningrate.limit a vector or a list containing the lowest and
 #' highest limit for the learning rate. Used only for RPROP and GRPROP.
 #' @param learningrate.factor a vector or a list containing the multiplication
@@ -64,36 +64,37 @@
 #' @param likelihood logical. If the error function is equal to the negative
 #' log-likelihood function, the information criteria AIC and BIC will be
 #' calculated. Furthermore the usage of confidence.interval is meaningfull.
+#' 
 #' @return \code{neuralnet} returns an object of class \code{nn}.  An object of
 #' class \code{nn} is a list containing at most the following components:
 #' 
-#' \item{ call }{ the matched call. } \item{ response }{ extracted from the
-#' \code{data argument}.  } \item{ covariate }{ the variables extracted from
-#' the \code{data argument}. } \item{ model.list }{ a list containing the
-#' covariates and the response variables extracted from the \code{formula
-#' argument}. } \item{ err.fct }{ the error function. } \item{ act.fct }{ the
-#' activation function. } \item{ data }{ the \code{data argument}.} \item{
-#' net.result }{ a list containing the overall result of the neural network for
-#' every repetition.} \item{ weights }{ a list containing the fitted weights of
-#' the neural network for every repetition. } \item{ generalized.weights }{ a
-#' list containing the generalized weights of the neural network for every
-#' repetition. } \item{ result.matrix }{ a matrix containing the reached
-#' threshold, needed steps, error, AIC and BIC (if computed) and weights for
-#' every repetition. Each column represents one repetition. } \item{
-#' startweights }{ a list containing the startweights of the neural network for
-#' every repetition. }
-#' @author Stefan Fritsch, Frauke Guenther \email{guenther@@leibniz-bips.de}
+#' \item{ call }{ the matched call. } 
+#' \item{ response }{ extracted from the \code{data argument}.  } 
+#' \item{ covariate }{ the variables extracted from the \code{data argument}. } 
+#' \item{ model.list }{ a list containing the covariates and the response variables extracted from the \code{formula argument}. } 
+#' \item{ err.fct }{ the error function. } 
+#' \item{ act.fct }{ the activation function. } 
+#' \item{ data }{ the \code{data argument}.} 
+#' \item{ net.result }{ a list containing the overall result of the neural network for every repetition.} 
+#' \item{ weights }{ a list containing the fitted weights of the neural network for every repetition. } 
+#' \item{ generalized.weights }{ a list containing the generalized weights of the neural network for every repetition. } 
+#' \item{ result.matrix }{ a matrix containing the reached threshold, needed steps, error, AIC and BIC (if computed) and weights for every repetition. Each column represents one repetition. } 
+#' \item{ startweights }{ a list containing the startweights of the neural network for every repetition. }
+#' 
+#' @author Stefan Fritsch, Frauke Guenther, Marvin N. Wright
+#' 
 #' @seealso \code{\link{plot.nn}} for plotting the neural network.
 #' 
 #' \code{\link{gwplot}} for plotting the generalized weights.
 #' 
-#' \code{\link{compute}} for computation of a given neural network for given
-#' covariate vectors.
+#' \code{\link{predict.nn}} for computation of a given neural network for given
+#' covariate vectors (formerly \code{compute}).
 #' 
 #' \code{\link{confidence.interval}} for calculation of confidence intervals of
 #' the weights.
 #' 
 #' \code{\link{prediction}} for a summary of the output of the neural network.
+#' 
 #' @references Riedmiller M. (1994) \emph{Rprop - Description and
 #' Implementation Details.} Technical Report. University of Karlsruhe.
 #' 
@@ -113,340 +114,345 @@
 #' @keywords neural
 #' @examples
 #' 
-#' AND <- c(rep(0,7),1)
-#' OR <- c(0,rep(1,7))
-#' binary.data <- data.frame(expand.grid(c(0,1), c(0,1), c(0,1)), AND, OR)
-#' print(net <- neuralnet(AND+OR~Var1+Var2+Var3,  binary.data, hidden=0, 
-#'              rep=10, err.fct="ce", linear.output=FALSE))
+#' library(neuralnet)
 #' 
-#' data(infert, package="datasets")
-#' print(net.infert <- neuralnet(case~parity+induced+spontaneous, infert, 
-#'                     err.fct="ce", linear.output=FALSE, likelihood=TRUE))
+#' # Binary classification
+#' nn <- neuralnet(Species == "setosa" ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
+#' \dontrun{print(nn)}
+#' \dontrun{plot(nn)}
 #' 
-#' @export neuralnet
+#' # Multiclass classification
+#' nn <- neuralnet((Species == "setosa") + (Species == "versicolor") + (Species == "virginica")
+#'                  ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
+#' \dontrun{print(nn)}
+#' \dontrun{plot(nn)}
+#' 
+#' # Custom activation function
+#' softplus <- function(x) log(1 + exp(x))
+#' nn <- neuralnet((Species == "setosa") ~ Petal.Length + Petal.Width, iris, 
+#'                 linear.output = FALSE, hidden = c(3, 2), act.fct = softplus)
+#' \dontrun{print(nn)}
+#' \dontrun{plot(nn)}
+#' 
+#' @export
 neuralnet <-
-function (formula, data, hidden = 1, threshold = 0.01, stepmax = 1e+05, 
-    rep = 1, startweights = NULL, learningrate.limit = NULL, 
-    learningrate.factor = list(minus = 0.5, plus = 1.2), learningrate = NULL, 
-    lifesign = "none", lifesign.step = 1000, algorithm = "rprop+", 
-    err.fct = "sse", act.fct = "logistic", linear.output = TRUE, 
-    exclude = NULL, constant.weights = NULL, likelihood = FALSE) 
-{
-    call <- match.call()
-    options(scipen = 100, digits = 10)
-    result <- varify.variables(data, formula, startweights, learningrate.limit, 
-        learningrate.factor, learningrate, lifesign, algorithm, 
-        threshold, lifesign.step, hidden, rep, stepmax, err.fct, 
-        act.fct)
-    data <- result$data
-    formula <- result$formula
-    startweights <- result$startweights
-    learningrate.limit <- result$learningrate.limit
-    learningrate.factor <- result$learningrate.factor
-    learningrate.bp <- result$learningrate.bp
-    lifesign <- result$lifesign
-    algorithm <- result$algorithm
-    threshold <- result$threshold
-    lifesign.step <- result$lifesign.step
-    hidden <- result$hidden
-    rep <- result$rep
-    stepmax <- result$stepmax
-    model.list <- result$model.list
-    matrix <- NULL
-    list.result <- NULL
-    result <- generate.initial.variables(data, model.list, hidden, 
-        act.fct, err.fct, algorithm, linear.output, formula)
-    covariate <- result$covariate
-    response <- result$response
-    err.fct <- result$err.fct
-    err.deriv.fct <- result$err.deriv.fct
-    act.fct <- result$act.fct
-    act.deriv.fct <- result$act.deriv.fct
-    for (i in 1:rep) {
-        if (lifesign != "none") {
-            lifesign <- display(hidden, threshold, rep, i, lifesign)
-        }
-        utils::flush.console()
-        result <- calculate.neuralnet(learningrate.limit = learningrate.limit, 
-            learningrate.factor = learningrate.factor, covariate = covariate, 
-            response = response, data = data, model.list = model.list, 
-            threshold = threshold, lifesign.step = lifesign.step, 
-            stepmax = stepmax, hidden = hidden, lifesign = lifesign, 
-            startweights = startweights, algorithm = algorithm, 
-            err.fct = err.fct, err.deriv.fct = err.deriv.fct, 
-            act.fct = act.fct, act.deriv.fct = act.deriv.fct, 
-            rep = i, linear.output = linear.output, exclude = exclude, 
-            constant.weights = constant.weights, likelihood = likelihood, 
-            learningrate.bp = learningrate.bp)
-        if (!is.null(result$output.vector)) {
-            list.result <- c(list.result, list(result))
-            matrix <- cbind(matrix, result$output.vector)
-        }
+  function (formula, data, hidden = 1, threshold = 0.01, stepmax = 1e+05,
+            rep = 1, startweights = NULL, learningrate.limit = NULL,
+            learningrate.factor = list(minus = 0.5, plus = 1.2), learningrate = NULL, 
+            lifesign = "none", lifesign.step = 1000, algorithm = "rprop+", 
+            err.fct = "sse", act.fct = "logistic", linear.output = TRUE,
+            exclude = NULL, constant.weights = NULL, likelihood = FALSE) {
+    
+  # TODO: Remove?
+  #call <- match.call()
+  #options(scipen = 100, digits = 10)
+  
+  # Check arguments
+  if (is.null(data)) {
+    stop("Missing 'data' argument.", call. = FALSE)
+  }
+  data <- as.data.frame(data)
+  
+  if (is.null(formula)) {
+    stop("Missing 'formula' argument.", call. = FALSE)
+  }
+  formula <- stats::as.formula(formula)
+    
+  # TODO: Needed? Check argument instead?
+  # if (!is.null(startweights)) {
+  #   startweights <- as.vector(unlist(startweights))
+  #   if (any(is.na(startweights))) 
+  #     startweights <- startweights[!is.na(startweights)]
+  # }
+  
+  # Learning rate limit
+  if (!is.null(learningrate.limit)) {
+    if (length(learningrate.limit) != 2) {
+      stop("Argument 'learningrate.factor' must consist of two components.", 
+           call. = FALSE)
+    }
+    learningrate.limit <- as.list(learningrate.limit)
+    names(learningrate.limit) <- c("min", "max")
+    
+    if (is.na(learningrate.limit$min) || is.na(learningrate.limit$max)) {
+      stop("'learningrate.limit' must be a numeric vector", 
+           call. = FALSE)
+    }
+  } else {
+    learningrate.limit <- list(min = 1e-10, max = 0.1)
+  }
+  
+  # Learning rate factor
+  if (!is.null(learningrate.factor)) {
+    if (length(learningrate.factor) != 2) {
+      stop("Argument 'learningrate.factor' must consist of two components.", 
+           call. = FALSE)
+    }
+    learningrate.factor <- as.list(learningrate.factor)
+    names(learningrate.factor) <- c("minus", "plus")
+
+    if (is.na(learningrate.factor$minus) || is.na(learningrate.factor$plus)) {
+      stop("'learningrate.factor' must be a numeric vector", 
+           call. = FALSE)
+    } 
+  } else {
+    learningrate.factor <- list(minus = 0.5, plus = 1.2)
+  }
+  
+  # Learning rate (backprop)
+  if (algorithm == "backprop") {
+    if (is.null(learningrate) || !is.numeric(learningrate)) {
+      stop("Argument 'learningrate' must be a numeric value, if the backpropagation algorithm is used.", 
+           call. = FALSE)
+    }
+  }
+  
+  # TODO: Rename?
+  # Lifesign
+  if (!(lifesign %in% c("none", "minimal", "full"))) {
+    stop("Argument 'lifesign' must be one of 'none', 'minimal', 'full'.", call. = FALSE)
+  }
+
+  # Algorithm
+  if (!(algorithm %in% c("rprop+", "rprop-", "slr", "sag", "backprop"))) {
+    stop("Unknown algorithm.", call. = FALSE)
+  }
+  
+  # Threshold
+  if (is.na(threshold)) {
+    stop("Argument 'threshold' must be a numeric value.", call. = FALSE)
+  }
+    
+  # Hidden units
+  if (any(is.na(hidden))) {
+    stop("Argument 'hidden' must be an integer vector or a single integer.", 
+         call. = FALSE)
+  } 
+  if (length(hidden) > 1 && any(hidden == 0)) {
+    stop("Argument 'hidden' contains at least one 0.", call. = FALSE)
+  }
+    
+  # Replications
+  if (is.na(rep)) {
+    stop("Argument 'rep' must be an integer", call. = FALSE)
+  }
+    
+  # Max steps
+  if (is.na(stepmax)) {
+    stop("Argument 'stepmax' must be an integer", call. = FALSE)
+  }
+    
+  # Activation function
+  if (!(is.function(act.fct) || act.fct %in% c("logistic", "tanh"))) {
+    stop("Unknown activation function.", call. = FALSE)
+  }
+  
+  # Error function
+  if (!(is.function(err.fct) || err.fct %in% c("sse", "ce"))) {
+    stop("Unknown error function.", call. = FALSE)
+  }
+  
+  # TODO: Refactor formula interface
+  model.vars <- attr(stats::terms(formula), "term.labels")
+  formula.reverse <- formula
+  formula.reverse[[3]] <- formula[[2]]
+  model.resp <- attr(stats::terms(formula.reverse), "term.labels")
+  model.list <- list(response = model.resp, variables = model.vars)
+  
+  formula.reverse <- formula
+  formula.reverse[[2]] <- stats::as.formula(paste(model.list$response[[1]], 
+                                                  "~", model.list$variables[[1]], sep = ""))[[2]]
+  formula.reverse[[3]] <- formula[[2]]
+  response <- as.matrix(stats::model.frame(formula.reverse, data))
+  formula.reverse[[3]] <- formula[[3]]
+  covariate <- as.matrix(stats::model.frame(formula.reverse, data))
+  covariate[, 1] <- 1
+  colnames(covariate)[1] <- "intercept"
+  
+  # Activation function
+  if (is.function(act.fct)) {
+    act.deriv.fct <- differentiate(act.fct)
+    attr(act.fct, "type") <- "function"
+  } else {
+    converted.fct <- convert.function(act.fct)
+    act.fct <- converted.fct$fct
+    act.deriv.fct <- converted.fct$deriv.fct
+  }
+  
+  # Error function
+  if (is.function(err.fct)) {
+    attr(err.fct, "type") <- "function"
+    err.deriv.fct <- differentiate(err.fct)
+  } else {
+    converted.fct <- convert.function(err.fct)
+    err.fct <- converted.fct$fct
+    err.deriv.fct <- converted.fct$deriv.fct
+  }
+  
+  # TODO: Check that "ce" not used for non-binary outcomes
+  
+  # TODO: Don't use for loop with append
+  # Fit network for each replication
+  matrix <- NULL
+  list.result <- NULL
+  for (i in 1:rep) {
+    # Show progress
+    if (lifesign != "none") {
+        lifesign <- display(hidden, threshold, rep, i, lifesign)
     }
     utils::flush.console()
-    if (!is.null(matrix)) {
-        weight.count <- length(unlist(list.result[[1]]$weights)) - 
-            length(exclude) + length(constant.weights) - sum(constant.weights == 
-            0)
-        if (!is.null(startweights) && length(startweights) < 
-            (rep * weight.count)) {
-            warning("some weights were randomly generated, because 'startweights' did not contain enough values", 
-                call. = F)
-        }
-        ncol.matrix <- ncol(matrix)
+    
+    # Fit network
+    result <- calculate.neuralnet(learningrate.limit = learningrate.limit, 
+        learningrate.factor = learningrate.factor, covariate = covariate, 
+        response = response, data = data, model.list = model.list, 
+        threshold = threshold, lifesign.step = lifesign.step, 
+        stepmax = stepmax, hidden = hidden, lifesign = lifesign, 
+        startweights = startweights, algorithm = algorithm, 
+        err.fct = err.fct, err.deriv.fct = err.deriv.fct, 
+        act.fct = act.fct, act.deriv.fct = act.deriv.fct, 
+        rep = i, linear.output = linear.output, exclude = exclude, 
+        constant.weights = constant.weights, likelihood = likelihood, 
+        learningrate.bp = learningrate.bp)
+    
+    # TODO: In which case this is NULL?
+    if (!is.null(result$output.vector)) {
+      list.result <- c(list.result, list(result))
+      matrix <- cbind(matrix, result$output.vector)
     }
-    else ncol.matrix <- 0
-    if (ncol.matrix < rep) 
-        warning(sprintf("algorithm did not converge in %s of %s repetition(s) within the stepmax", 
-            (rep - ncol.matrix), rep), call. = FALSE)
-    nn <- generate.output(covariate, call, rep, threshold, matrix, 
-        startweights, model.list, response, err.fct, act.fct, 
-        data, list.result, linear.output, exclude)
-    return(nn)
+  }
+  
+  if (is.null(matrix)) {
+    ncol.matrix <- 0
+  } else {
+    weight.count <- length(unlist(list.result[[1]]$weights)) - 
+      length(exclude) + length(constant.weights) - sum(constant.weights == 0)
+    
+    # TODO: How can this happen?
+    if (!is.null(startweights) && length(startweights) < (rep * weight.count)) {
+      warning("Some weights were randomly generated, because 'startweights' did not contain enough values.", 
+              call. = F)
+    }
+    
+    ncol.matrix <- ncol(matrix)
+  }
+  
+  # Warning if some replications did not converge
+  if (ncol.matrix < rep) {
+    warning(sprintf("Algorithm did not converge in %s of %s repetition(s) within the stepmax.", 
+                    (rep - ncol.matrix), rep), call. = FALSE)
+  }
+      
+  # Return output
+  generate.output(covariate, call, rep, threshold, matrix, 
+      startweights, model.list, response, err.fct, act.fct, 
+      data, list.result, linear.output, exclude)
 }
 
-varify.variables <-
-function (data, formula, startweights, learningrate.limit, learningrate.factor, 
-    learningrate.bp, lifesign, algorithm, threshold, lifesign.step, 
-    hidden, rep, stepmax, err.fct, act.fct) 
-{
-    if (is.null(data)) 
-        stop("'data' is missing", call. = FALSE)
-    if (is.null(formula)) 
-        stop("'formula' is missing", call. = FALSE)
-    if (!is.null(startweights)) {
-        startweights <- as.vector(unlist(startweights))
-        if (any(is.na(startweights))) 
-            startweights <- startweights[!is.na(startweights)]
+# Convert named functions in R functions, including derivatives 
+convert.function <- function(fun) {
+  if (fun == "tanh") {
+    fct <- function(x) {
+      tanh(x)
     }
-    data <- as.data.frame(data)
-    formula <- stats::as.formula(formula)
-    model.vars <- attr(stats::terms(formula), "term.labels")
-    formula.reverse <- formula
-    formula.reverse[[3]] <- formula[[2]]
-    model.resp <- attr(stats::terms(formula.reverse), "term.labels")
-    model.list <- list(response = model.resp, variables = model.vars)
-    if (!is.null(learningrate.limit)) {
-        if (length(learningrate.limit) != 2) 
-            stop("'learningrate.factor' must consist of two components", 
-                call. = FALSE)
-        learningrate.limit <- as.list(learningrate.limit)
-        names(learningrate.limit) <- c("min", "max")
-        learningrate.limit$min <- as.vector(as.numeric(learningrate.limit$min))
-        learningrate.limit$max <- as.vector(as.numeric(learningrate.limit$max))
-        if (is.na(learningrate.limit$min) || is.na(learningrate.limit$max)) 
-            stop("'learningrate.limit' must be a numeric vector", 
-                call. = FALSE)
+    attr(fct, "type") <- "tanh"
+    deriv.fct <- function(x) {
+      1 - x^2
     }
-    if (!is.null(learningrate.factor)) {
-        if (length(learningrate.factor) != 2) 
-            stop("'learningrate.factor' must consist of two components", 
-                call. = FALSE)
-        learningrate.factor <- as.list(learningrate.factor)
-        names(learningrate.factor) <- c("minus", "plus")
-        learningrate.factor$minus <- as.vector(as.numeric(learningrate.factor$minus))
-        learningrate.factor$plus <- as.vector(as.numeric(learningrate.factor$plus))
-        if (is.na(learningrate.factor$minus) || is.na(learningrate.factor$plus)) 
-            stop("'learningrate.factor' must be a numeric vector", 
-                call. = FALSE)
+  } else if (fun == "logistic") {
+    fct <- function(x) {
+      1/(1 + exp(-x))
     }
-    else learningrate.factor <- list(minus = c(0.5), plus = c(1.2))
-    if (is.null(lifesign)) 
-        lifesign <- "none"
-    lifesign <- as.character(lifesign)
-    if (!((lifesign == "none") || (lifesign == "minimal") || 
-        (lifesign == "full"))) 
-        lifesign <- "minimal"
-    if (is.na(lifesign)) 
-        stop("'lifesign' must be a character", call. = FALSE)
-    if (is.null(algorithm)) 
-        algorithm <- "rprop+"
-    algorithm <- as.character(algorithm)
-    if (!((algorithm == "rprop+") || (algorithm == "rprop-") || 
-        (algorithm == "slr") || (algorithm == "sag") || (algorithm == 
-        "backprop"))) 
-        stop("'algorithm' is not known", call. = FALSE)
-    if (is.null(threshold)) 
-        threshold <- 0.01
-    threshold <- as.numeric(threshold)
-    if (is.na(threshold)) 
-        stop("'threshold' must be a numeric value", call. = FALSE)
-    if (algorithm == "backprop") 
-        if (is.null(learningrate.bp) || !is.numeric(learningrate.bp)) 
-            stop("'learningrate' must be a numeric value, if the backpropagation algorithm is used", 
-                call. = FALSE)
-    if (is.null(lifesign.step)) 
-        lifesign.step <- 1000
-    lifesign.step <- as.integer(lifesign.step)
-    if (is.na(lifesign.step)) 
-        stop("'lifesign.step' must be an integer", call. = FALSE)
-    if (lifesign.step < 1) 
-        lifesign.step <- as.integer(100)
-    if (is.null(hidden)) 
-        hidden <- 0
-    hidden <- as.vector(as.integer(hidden))
-    if (prod(!is.na(hidden)) == 0) 
-        stop("'hidden' must be an integer vector or a single integer", 
-            call. = FALSE)
-    if (length(hidden) > 1 && prod(hidden) == 0) 
-        stop("'hidden' contains at least one 0", call. = FALSE)
-    if (is.null(rep)) 
-        rep <- 1
-    rep <- as.integer(rep)
-    if (is.na(rep)) 
-        stop("'rep' must be an integer", call. = FALSE)
-    if (is.null(stepmax)) 
-        stepmax <- 10000
-    stepmax <- as.integer(stepmax)
-    if (is.na(stepmax)) 
-        stop("'stepmax' must be an integer", call. = FALSE)
-    if (stepmax < 1) 
-        stepmax <- as.integer(1000)
-    if (is.null(hidden)) {
-        if (is.null(learningrate.limit)) 
-            learningrate.limit <- list(min = c(1e-08), max = c(50))
+    attr(fct, "type") <- "logistic"
+    deriv.fct <- function(x) {
+      x * (1 - x)
     }
-    else {
-        if (is.null(learningrate.limit)) 
-            learningrate.limit <- list(min = c(1e-10), max = c(0.1))
+  } else if (fun == "sse") {
+    fct <- function(x, y) {
+      1/2 * (y - x)^2
     }
-    if (!is.function(act.fct) && act.fct != "logistic" && act.fct != 
-        "tanh") 
-        stop("''act.fct' is not known", call. = FALSE)
-    if (!is.function(err.fct) && err.fct != "sse" && err.fct != 
-        "ce") 
-        stop("'err.fct' is not known", call. = FALSE)
-    return(list(data = data, formula = formula, startweights = startweights, 
-        learningrate.limit = learningrate.limit, learningrate.factor = learningrate.factor, 
-        learningrate.bp = learningrate.bp, lifesign = lifesign, 
-        algorithm = algorithm, threshold = threshold, lifesign.step = lifesign.step, 
-        hidden = hidden, rep = rep, stepmax = stepmax, model.list = model.list))
+    attr(fct, "type") <- "sse"
+    deriv.fct <- function(x, y) {
+      x - y
+    }
+  } else if (fun == "ce") {
+    fct <- function(x, y) {
+      -(y * log(x) + (1 - y) * log(1 - x))
+    }
+    attr(fct, "type") <- "ce"
+    deriv.fct <- function(x, y) {
+      (1 - y)/(1 - x) - y/x
+    }
+  } else {
+    stop("Unknown function.", call. = FALSE)
+  }
+  list(fct = fct, deriv.fct = deriv.fct)
 }
 
-generate.initial.variables <-
-function (data, model.list, hidden, act.fct, err.fct, algorithm, 
-    linear.output, formula) 
-{
-    formula.reverse <- formula
-    formula.reverse[[2]] <- stats::as.formula(paste(model.list$response[[1]], 
-        "~", model.list$variables[[1]], sep = ""))[[2]]
-    formula.reverse[[3]] <- formula[[2]]
-    response <- as.matrix(stats::model.frame(formula.reverse, data))
-    formula.reverse[[3]] <- formula[[3]]
-    covariate <- as.matrix(stats::model.frame(formula.reverse, data))
-    covariate[, 1] <- 1
-    colnames(covariate)[1] <- "intercept"
-    if (is.function(act.fct)) {
-        act.deriv.fct <- differentiate(act.fct)
-        attr(act.fct, "type") <- "function"
-    }
-    else {
-        if (act.fct == "tanh") {
-            act.fct <- function(x) {
-                tanh(x)
-            }
-            attr(act.fct, "type") <- "tanh"
-            act.deriv.fct <- function(x) {
-                1 - x^2
-            }
-        }
-        else if (act.fct == "logistic") {
-            act.fct <- function(x) {
-                1/(1 + exp(-x))
-            }
-            attr(act.fct, "type") <- "logistic"
-            act.deriv.fct <- function(x) {
-                x * (1 - x)
-            }
-        }
-    }
-    if (is.function(err.fct)) {
-        err.deriv.fct <- differentiate(err.fct)
-        attr(err.fct, "type") <- "function"
-    }
-    else {
-        if (err.fct == "ce") {
-            if (all(response == 0 | response == 1)) {
-                err.fct <- function(x, y) {
-                  -(y * log(x) + (1 - y) * log(1 - x))
-                }
-                attr(err.fct, "type") <- "ce"
-                err.deriv.fct <- function(x, y) {
-                  (1 - y)/(1 - x) - y/x
-                }
-            }
-            else {
-                err.fct <- function(x, y) {
-                  1/2 * (y - x)^2
-                }
-                attr(err.fct, "type") <- "sse"
-                err.deriv.fct <- function(x, y) {
-                  x - y
-                }
-                warning("'err.fct' was automatically set to sum of squared error (sse), because the response is not binary", 
-                  call. = F)
-            }
-        }
-        else if (err.fct == "sse") {
-            err.fct <- function(x, y) {
-                1/2 * (y - x)^2
-            }
-            attr(err.fct, "type") <- "sse"
-            err.deriv.fct <- function(x, y) {
-                x - y
-            }
-        }
-    }
-    return(list(covariate = covariate, response = response, err.fct = err.fct, 
-        err.deriv.fct = err.deriv.fct, act.fct = act.fct, act.deriv.fct = act.deriv.fct))
-}
 differentiate <-
-function (orig.fct, hessian = FALSE) 
-{
+  function (orig.fct, hessian = FALSE) 
+  {
     body.fct <- deparse(body(orig.fct))
     if (body.fct[1] == "{") 
-        body.fct <- body.fct[2]
+      body.fct <- body.fct[2]
     text <- paste("y~", body.fct, sep = "")
     text2 <- paste(deparse(orig.fct)[1], "{}")
     temp <- stats::deriv(eval(parse(text = text)), "x", func = eval(parse(text = text2)), 
-        hessian = hessian)
+                         hessian = hessian)
     temp <- deparse(temp)
     derivative <- NULL
     if (!hessian) 
-        for (i in 1:length(temp)) {
-            if (!any(grep("value", temp[i]))) 
-                derivative <- c(derivative, temp[i])
-        }
+      for (i in 1:length(temp)) {
+        if (!any(grep("value", temp[i]))) 
+          derivative <- c(derivative, temp[i])
+      }
     else for (i in 1:length(temp)) {
-        if (!any(grep("value", temp[i]), grep("grad", temp[i]), 
-            grep(", c", temp[i]))) 
-            derivative <- c(derivative, temp[i])
+      if (!any(grep("value", temp[i]), grep("grad", temp[i]), 
+               grep(", c", temp[i]))) 
+        derivative <- c(derivative, temp[i])
     }
     number <- NULL
     for (i in 1:length(derivative)) {
-        if (any(grep("<-", derivative[i]))) 
-            number <- i
+      if (any(grep("<-", derivative[i]))) 
+        number <- i
     }
     if (is.null(number)) {
-        return(function(x) {
-            matrix(0, nrow(x), ncol(x))
-        })
+      return(function(x) {
+        matrix(0, nrow(x), ncol(x))
+      })
     }
     else {
-        derivative[number] <- unlist(strsplit(derivative[number], 
-            "<-"))[2]
-        derivative <- eval(parse(text = derivative))
+      derivative[number] <- unlist(strsplit(derivative[number], 
+                                            "<-"))[2]
+      derivative <- eval(parse(text = derivative))
     }
     if (length(formals(derivative)) == 1 && length(derivative(c(1, 
-        1))) == 1) 
-        derivative <- eval(parse(text = paste("function(x){matrix(", 
-            derivative(1), ", nrow(x), ncol(x))}")))
+                                                                1))) == 1) 
+      derivative <- eval(parse(text = paste("function(x){matrix(", 
+                                            derivative(1), ", nrow(x), ncol(x))}")))
     if (length(formals(derivative)) == 2 && length(derivative(c(1, 
-        1), c(1, 1))) == 1) 
-        derivative <- eval(parse(text = paste("function(x, y){matrix(", 
-            derivative(1, 1), ", nrow(x), ncol(x))}")))
+                                                                1), c(1, 1))) == 1) 
+      derivative <- eval(parse(text = paste("function(x, y){matrix(", 
+                                            derivative(1, 1), ", nrow(x), ncol(x))}")))
     return(derivative)
-}
+  }
+
+# TODO: Use this version. Why different?
+# # Compute symbolic derivative of a function
+# differentiate <- function (orig.fct, hessian = FALSE) {
+#   browser()
+#   text_fun <- paste(trimws(deparse(body(orig.fct))), collapse = "")
+#   if (grepl("\\{|\\}", text_fun)) {
+#     # Handle "{" and "}" in expression
+#     text_fun_clean <- gsub("\\{|\\}", "", text_fun)
+#     fct.body <- parse(text = text_fun_clean)
+#   } else {
+#     fct.body <- body(orig.fct)
+#   }
+#   deriv(fct.body, names(formals(orig.fct)), hessian = hessian, 
+#         function.arg = names(formals(orig.fct)))
+# }
+
 display <-
 function (hidden, threshold, rep, i.rep, lifesign) 
 {
