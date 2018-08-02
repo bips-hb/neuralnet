@@ -10,7 +10,7 @@ Authors@R: c(
     person(given="Marc", family="Suling", role="ctb"),	
     person(given="Sebastian M.", family="Mueller", role = "ctb"))
 Depends: R (>= 2.9.0)
-Imports: grid, MASS, grDevices, stats, utils
+Imports: grid, MASS, grDevices, stats, utils, Deriv
 Description: Training of neural networks using backpropagation,
     resilient backpropagation with (Riedmiller, 1994) or without
     weight backtracking (Riedmiller and Braun, 1993) or the

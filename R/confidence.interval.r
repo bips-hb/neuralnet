@@ -102,13 +102,13 @@ function (covariate, response, weights, err.fct, act.fct, exclude,
     }
     else {
         attr(temp, "type") <- NULL
-        act.deriv.fct <- differentiate(temp)
-        act.deriv2.fct <- differentiate(temp, hessian = T)
+        act.deriv.fct <- Deriv::Deriv(temp, nderiv = 1, x = "x")
+        act.deriv2.fct <- Deriv::Deriv(temp, nderiv = 2, x = "x")
     }
     temp <- err.fct
     attr(temp, "type") <- NULL
-    err.deriv.fct <- differentiate(temp)
-    err.deriv2.fct <- differentiate(temp, hessian = T)
+    err.deriv.fct <- Deriv::Deriv(temp, nderiv = 1, x = "x")
+    err.deriv2.fct <- Deriv::Deriv(temp, nderiv = 2, x = "x")
     length.weights <- length(weights)
     nrow.weights <- sapply(weights, nrow)
     ncol.weights <- sapply(weights, ncol)

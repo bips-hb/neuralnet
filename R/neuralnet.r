@@ -271,10 +271,10 @@ neuralnet <-
   
   # Activation function
   if (is.function(act.fct)) {
-    act.deriv.fct <- differentiate(act.fct)
+    act.deriv.fct <- Deriv::Deriv(act.fct)
     attr(act.fct, "type") <- "function"
   } else {
-    converted.fct <- convert.function(act.fct)
+    converted.fct <- convert.activation.function(act.fct)
     act.fct <- converted.fct$fct
     act.deriv.fct <- converted.fct$deriv.fct
   }
@@ -282,9 +282,9 @@ neuralnet <-
   # Error function
   if (is.function(err.fct)) {
     attr(err.fct, "type") <- "function"
-    err.deriv.fct <- differentiate(err.fct)
+    err.deriv.fct <- Deriv::Deriv(err.fct)
   } else {
-    converted.fct <- convert.function(err.fct)
+    converted.fct <- convert.error.function(err.fct)
     err.fct <- converted.fct$fct
     err.deriv.fct <- converted.fct$deriv.fct
   }
@@ -313,7 +313,7 @@ neuralnet <-
         act.fct = act.fct, act.deriv.fct = act.deriv.fct, 
         rep = i, linear.output = linear.output, exclude = exclude, 
         constant.weights = constant.weights, likelihood = likelihood, 
-        learningrate.bp = learningrate.bp)
+        learningrate.bp = learningrate)
     
     # TODO: In which case this is NULL?
     if (!is.null(result$output.vector)) {
@@ -349,8 +349,8 @@ neuralnet <-
       data, list.result, linear.output, exclude)
 }
 
-# Convert named functions in R functions, including derivatives 
-convert.function <- function(fun) {
+# Convert named activation functions in R functions, including derivatives 
+convert.activation.function <- function(fun) {
   if (fun == "tanh") {
     fct <- function(x) {
       tanh(x)
@@ -367,7 +367,15 @@ convert.function <- function(fun) {
     deriv.fct <- function(x) {
       x * (1 - x)
     }
-  } else if (fun == "sse") {
+  } else {
+    stop("Unknown function.", call. = FALSE)
+  }
+  list(fct = fct, deriv.fct = deriv.fct)
+}
+
+# Convert named error functions in R functions, including derivatives 
+convert.error.function <- function(fun) {
+  if (fun == "sse") {
     fct <- function(x, y) {
       1/2 * (y - x)^2
     }
@@ -388,70 +396,6 @@ convert.function <- function(fun) {
   }
   list(fct = fct, deriv.fct = deriv.fct)
 }
-
-differentiate <-
-  function (orig.fct, hessian = FALSE) 
-  {
-    body.fct <- deparse(body(orig.fct))
-    if (body.fct[1] == "{") 
-      body.fct <- body.fct[2]
-    text <- paste("y~", body.fct, sep = "")
-    text2 <- paste(deparse(orig.fct)[1], "{}")
-    temp <- stats::deriv(eval(parse(text = text)), "x", func = eval(parse(text = text2)), 
-                         hessian = hessian)
-    temp <- deparse(temp)
-    derivative <- NULL
-    if (!hessian) 
-      for (i in 1:length(temp)) {
-        if (!any(grep("value", temp[i]))) 
-          derivative <- c(derivative, temp[i])
-      }
-    else for (i in 1:length(temp)) {
-      if (!any(grep("value", temp[i]), grep("grad", temp[i]), 
-               grep(", c", temp[i]))) 
-        derivative <- c(derivative, temp[i])
-    }
-    number <- NULL
-    for (i in 1:length(derivative)) {
-      if (any(grep("<-", derivative[i]))) 
-        number <- i
-    }
-    if (is.null(number)) {
-      return(function(x) {
-        matrix(0, nrow(x), ncol(x))
-      })
-    }
-    else {
-      derivative[number] <- unlist(strsplit(derivative[number], 
-                                            "<-"))[2]
-      derivative <- eval(parse(text = derivative))
-    }
-    if (length(formals(derivative)) == 1 && length(derivative(c(1, 
-                                                                1))) == 1) 
-      derivative <- eval(parse(text = paste("function(x){matrix(", 
-                                            derivative(1), ", nrow(x), ncol(x))}")))
-    if (length(formals(derivative)) == 2 && length(derivative(c(1, 
-                                                                1), c(1, 1))) == 1) 
-      derivative <- eval(parse(text = paste("function(x, y){matrix(", 
-                                            derivative(1, 1), ", nrow(x), ncol(x))}")))
-    return(derivative)
-  }
-
-# TODO: Use this version. Why different?
-# # Compute symbolic derivative of a function
-# differentiate <- function (orig.fct, hessian = FALSE) {
-#   browser()
-#   text_fun <- paste(trimws(deparse(body(orig.fct))), collapse = "")
-#   if (grepl("\\{|\\}", text_fun)) {
-#     # Handle "{" and "}" in expression
-#     text_fun_clean <- gsub("\\{|\\}", "", text_fun)
-#     fct.body <- parse(text = text_fun_clean)
-#   } else {
-#     fct.body <- body(orig.fct)
-#   }
-#   deriv(fct.body, names(formals(orig.fct)), hessian = hessian, 
-#         function.arg = names(formals(orig.fct)))
-# }
 
 display <-
 function (hidden, threshold, rep, i.rep, lifesign) 
