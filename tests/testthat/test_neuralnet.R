@@ -75,4 +75,9 @@ test_that("Same result with custom activation function", {
   expect_equal(nn_custom$result.matrix, nn_default$result.matrix)
 })
 
+test_that("Error if 'ce' error function used in non-binary outcome", {
+  expect_error(neuralnet(Sepal.Length ~ Petal.Length + Petal.Width, 
+                         iris, linear.output = TRUE, err.fct = "ce"), 
+               "Error function 'ce' only implemented for binary response\\.")
+})
 

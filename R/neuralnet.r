@@ -134,6 +134,7 @@
 #' \dontrun{print(nn)}
 #' \dontrun{plot(nn)}
 #' 
+#' @import stats 
 #' @export
 neuralnet <-
   function (formula, data, hidden = 1, threshold = 0.01, stepmax = 1e+05,
@@ -143,9 +144,8 @@ neuralnet <-
             err.fct = "sse", act.fct = "logistic", linear.output = TRUE,
             exclude = NULL, constant.weights = NULL, likelihood = FALSE) {
     
-  # TODO: Remove?
-  #call <- match.call()
-  #options(scipen = 100, digits = 10)
+  # Save call
+  call <- match.call()
   
   # Check arguments
   if (is.null(data)) {
@@ -157,13 +157,6 @@ neuralnet <-
     stop("Missing 'formula' argument.", call. = FALSE)
   }
   formula <- stats::as.formula(formula)
-    
-  # TODO: Needed? Check argument instead?
-  # if (!is.null(startweights)) {
-  #   startweights <- as.vector(unlist(startweights))
-  #   if (any(is.na(startweights))) 
-  #     startweights <- startweights[!is.na(startweights)]
-  # }
   
   # Learning rate limit
   if (!is.null(learningrate.limit)) {
@@ -252,22 +245,11 @@ neuralnet <-
     stop("Unknown error function.", call. = FALSE)
   }
   
-  # TODO: Refactor formula interface
-  model.vars <- attr(stats::terms(formula), "term.labels")
-  formula.reverse <- formula
-  formula.reverse[[3]] <- formula[[2]]
-  model.resp <- attr(stats::terms(formula.reverse), "term.labels")
-  model.list <- list(response = model.resp, variables = model.vars)
-  
-  formula.reverse <- formula
-  formula.reverse[[2]] <- stats::as.formula(paste(model.list$response[[1]], 
-                                                  "~", model.list$variables[[1]], sep = ""))[[2]]
-  formula.reverse[[3]] <- formula[[2]]
-  response <- as.matrix(stats::model.frame(formula.reverse, data))
-  formula.reverse[[3]] <- formula[[3]]
-  covariate <- as.matrix(stats::model.frame(formula.reverse, data))
-  covariate[, 1] <- 1
-  colnames(covariate)[1] <- "intercept"
+  # Formula interface
+  model.list <- list(response = attr(terms(as.formula(call("~", formula[[2]]))), "term.labels"), 
+                     variables = attr(terms(formula), "term.labels"))
+  response <- as.matrix(model.frame(as.formula(call("~", formula[[2]])), data))
+  covariate <- cbind(intercept = 1, as.matrix(model.frame(as.formula(call("~", formula[[3]])), data)))
   
   # Activation function
   if (is.function(act.fct)) {
@@ -289,7 +271,9 @@ neuralnet <-
     err.deriv.fct <- converted.fct$deriv.fct
   }
   
-  # TODO: Check that "ce" not used for non-binary outcomes
+  if (type(err.fct) == "ce" && !all(response %in% 0:1)) {
+    stop("Error function 'ce' only implemented for binary response.", call. = FALSE)
+  } 
   
   # TODO: Don't use for loop with append
   # Fit network for each replication
