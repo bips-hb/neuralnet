@@ -1,0 +1,6 @@
+##### Version 1.4.0
+* New maintainer: Marvin N.Wright
+* Add a predict() function to replace compute()
+* Use Deriv package for symbolic derivation
+* Many internal changes to improve code quality
+* Bug fixes
