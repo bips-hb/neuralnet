@@ -281,7 +281,6 @@ neuralnet <-
     if (lifesign != "none") {
       lifesign <- display(hidden, threshold, rep, i, lifesign)
     }
-    utils::flush.console()
     
     # Fit network
     calculate.neuralnet(learningrate.limit = learningrate.limit, 
@@ -365,15 +364,17 @@ convert.error.function <- function(fun) {
   list(fct = fct, deriv.fct = deriv.fct)
 }
 
+# Function to display output of replication
 display <- function (hidden, threshold, rep, i.rep, lifesign) {
-  text <- paste("    rep: %", nchar(rep) - nchar(i.rep), "s", 
-                sep = "")
   message("hidden: ", paste(hidden, collapse = ", "), "    thresh: ", 
-          threshold, sprintf(eval(expression(text)), ""), i.rep, 
-          "/", rep, "    steps: ", appendLF = FALSE)
-  if (lifesign == "full") 
+          threshold, "    rep: ", strrep(" ", nchar(rep) - nchar(i.rep)), 
+          i.rep, "/", rep, "    steps: ", appendLF = FALSE)
+  utils::flush.console()
+  
+  if (lifesign == "full") {
     lifesign <- sum(nchar(hidden)) + 2 * length(hidden) - 
       2 + max(nchar(threshold)) + 2 * nchar(rep) + 41
+  }
   return(lifesign)
 }
 
