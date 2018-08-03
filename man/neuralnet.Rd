@@ -30,8 +30,8 @@ process.}
 
 \item{rep}{the number of repetitions for the neural network's training.}
 
-\item{startweights}{a vector containing starting values for the weights. The
-weights will not be randomly initialized.}
+\item{startweights}{a vector containing starting values for the weights. 
+Set to \code{NULL} for random initialization.}
 
 \item{learningrate.limit}{a vector or a list containing the lowest and
 highest limit for the learning rate. Used only for RPROP and GRPROP.}
@@ -85,29 +85,26 @@ calculated. Furthermore the usage of confidence.interval is meaningfull.}
 \code{neuralnet} returns an object of class \code{nn}.  An object of
 class \code{nn} is a list containing at most the following components:
 
-\item{ call }{ the matched call. } \item{ response }{ extracted from the
-\code{data argument}.  } \item{ covariate }{ the variables extracted from
-the \code{data argument}. } \item{ model.list }{ a list containing the
-covariates and the response variables extracted from the \code{formula
-argument}. } \item{ err.fct }{ the error function. } \item{ act.fct }{ the
-activation function. } \item{ data }{ the \code{data argument}.} \item{
-net.result }{ a list containing the overall result of the neural network for
-every repetition.} \item{ weights }{ a list containing the fitted weights of
-the neural network for every repetition. } \item{ generalized.weights }{ a
-list containing the generalized weights of the neural network for every
-repetition. } \item{ result.matrix }{ a matrix containing the reached
-threshold, needed steps, error, AIC and BIC (if computed) and weights for
-every repetition. Each column represents one repetition. } \item{
-startweights }{ a list containing the startweights of the neural network for
-every repetition. }
+\item{ call }{ the matched call. } 
+\item{ response }{ extracted from the \code{data argument}.  } 
+\item{ covariate }{ the variables extracted from the \code{data argument}. } 
+\item{ model.list }{ a list containing the covariates and the response variables extracted from the \code{formula argument}. } 
+\item{ err.fct }{ the error function. } 
+\item{ act.fct }{ the activation function. } 
+\item{ data }{ the \code{data argument}.} 
+\item{ net.result }{ a list containing the overall result of the neural network for every repetition.} 
+\item{ weights }{ a list containing the fitted weights of the neural network for every repetition. } 
+\item{ generalized.weights }{ a list containing the generalized weights of the neural network for every repetition. } 
+\item{ result.matrix }{ a matrix containing the reached threshold, needed steps, error, AIC and BIC (if computed) and weights for every repetition. Each column represents one repetition. } 
+\item{ startweights }{ a list containing the startweights of the neural network for every repetition. }
 }
 \description{
-\code{neuralnet} is used to train neural networks using backpropagation,
+Train neural networks using backpropagation,
 resilient backpropagation (RPROP) with (Riedmiller, 1994) or without weight
 backtracking (Riedmiller and Braun, 1993) or the modified globally
 convergent version (GRPROP) by Anastasiadis et al. (2005). The function
 allows flexible settings through custom-choice of error and activation
-function. Furthermore the calculation of generalized weights (Intrator O.
+function. Furthermore, the calculation of generalized weights (Intrator O.
 and Intrator N., 1993) is implemented.
 }
 \details{
@@ -119,15 +116,25 @@ algorithm are limited to the boundaries defined in learningrate.limit.
 }
 \examples{
 
-AND <- c(rep(0,7),1)
-OR <- c(0,rep(1,7))
-binary.data <- data.frame(expand.grid(c(0,1), c(0,1), c(0,1)), AND, OR)
-print(net <- neuralnet(AND+OR~Var1+Var2+Var3,  binary.data, hidden=0, 
-             rep=10, err.fct="ce", linear.output=FALSE))
+library(neuralnet)
 
-data(infert, package="datasets")
-print(net.infert <- neuralnet(case~parity+induced+spontaneous, infert, 
-                    err.fct="ce", linear.output=FALSE, likelihood=TRUE))
+# Binary classification
+nn <- neuralnet(Species == "setosa" ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
+\dontrun{print(nn)}
+\dontrun{plot(nn)}
+
+# Multiclass classification
+nn <- neuralnet((Species == "setosa") + (Species == "versicolor") + (Species == "virginica")
+                 ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
+\dontrun{print(nn)}
+\dontrun{plot(nn)}
+
+# Custom activation function
+softplus <- function(x) log(1 + exp(x))
+nn <- neuralnet((Species == "setosa") ~ Petal.Length + Petal.Width, iris, 
+                linear.output = FALSE, hidden = c(3, 2), act.fct = softplus)
+\dontrun{print(nn)}
+\dontrun{plot(nn)}
 
 }
 \references{
@@ -153,8 +160,8 @@ Computing Section, 244-249 San Francisco: American Statistical Society
 
 \code{\link{gwplot}} for plotting the generalized weights.
 
-\code{\link{compute}} for computation of a given neural network for given
-covariate vectors.
+\code{\link{predict.nn}} for computation of a given neural network for given
+covariate vectors (formerly \code{compute}).
 
 \code{\link{confidence.interval}} for calculation of confidence intervals of
 the weights.
@@ -162,6 +169,6 @@ the weights.
 \code{\link{prediction}} for a summary of the output of the neural network.
 }
 \author{
-Stefan Fritsch, Frauke Guenther \email{guenther@leibniz-bips.de}
+Stefan Fritsch, Frauke Guenther, Marvin N. Wright
 }
 \keyword{neural}
