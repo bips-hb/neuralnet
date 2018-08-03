@@ -275,49 +275,33 @@ neuralnet <-
     stop("Error function 'ce' only implemented for binary response.", call. = FALSE)
   } 
   
-  # TODO: Don't use for loop with append
   # Fit network for each replication
-  matrix <- NULL
-  list.result <- NULL
-  for (i in 1:rep) {
+  list.result <- lapply(1:rep, function(i) {
     # Show progress
     if (lifesign != "none") {
-        lifesign <- display(hidden, threshold, rep, i, lifesign)
+      lifesign <- display(hidden, threshold, rep, i, lifesign)
     }
     utils::flush.console()
     
     # Fit network
-    result <- calculate.neuralnet(learningrate.limit = learningrate.limit, 
-        learningrate.factor = learningrate.factor, covariate = covariate, 
-        response = response, data = data, model.list = model.list, 
-        threshold = threshold, lifesign.step = lifesign.step, 
-        stepmax = stepmax, hidden = hidden, lifesign = lifesign, 
-        startweights = startweights, algorithm = algorithm, 
-        err.fct = err.fct, err.deriv.fct = err.deriv.fct, 
-        act.fct = act.fct, act.deriv.fct = act.deriv.fct, 
-        rep = i, linear.output = linear.output, exclude = exclude, 
-        constant.weights = constant.weights, likelihood = likelihood, 
-        learningrate.bp = learningrate)
-    
-    # TODO: In which case this is NULL?
-    if (!is.null(result$output.vector)) {
-      list.result <- c(list.result, list(result))
-      matrix <- cbind(matrix, result$output.vector)
-    }
-  }
-  
-  if (is.null(matrix)) {
+    calculate.neuralnet(learningrate.limit = learningrate.limit, 
+                        learningrate.factor = learningrate.factor, covariate = covariate, 
+                        response = response, data = data, model.list = model.list, 
+                        threshold = threshold, lifesign.step = lifesign.step, 
+                        stepmax = stepmax, hidden = hidden, lifesign = lifesign, 
+                        startweights = startweights, algorithm = algorithm, 
+                        err.fct = err.fct, err.deriv.fct = err.deriv.fct, 
+                        act.fct = act.fct, act.deriv.fct = act.deriv.fct, 
+                        rep = i, linear.output = linear.output, exclude = exclude, 
+                        constant.weights = constant.weights, likelihood = likelihood, 
+                        learningrate.bp = learningrate)
+  })
+  matrix <- sapply(list.result, function(x) {x$output.vector})
+  if (all(sapply(matrix, is.null))) {
+    list.result <- NULL
+    matrix <- NULL
     ncol.matrix <- 0
   } else {
-    weight.count <- length(unlist(list.result[[1]]$weights)) - 
-      length(exclude) + length(constant.weights) - sum(constant.weights == 0)
-    
-    # TODO: How can this happen?
-    if (!is.null(startweights) && length(startweights) < (rep * weight.count)) {
-      warning("Some weights were randomly generated, because 'startweights' did not contain enough values.", 
-              call. = F)
-    }
-    
     ncol.matrix <- ncol(matrix)
   }
   
