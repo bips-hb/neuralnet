@@ -48,7 +48,7 @@ function (x, list.glm = NULL)
         data.error <- sum(nn$err.fct(data.result, nn$response), 
             na.rm = T)
     else data.error <- sum(nn$err.fct(data.result, nn$response))
-    cat("Data Error:\t", data.error, ";\n", sep = "")
+    message("Data Error:\t", data.error, ";")
     predictions
 }
 calculate.predictions <-

@@ -365,19 +365,18 @@ convert.error.function <- function(fun) {
   list(fct = fct, deriv.fct = deriv.fct)
 }
 
-display <-
-function (hidden, threshold, rep, i.rep, lifesign) 
-{
-    text <- paste("    rep: %", nchar(rep) - nchar(i.rep), "s", 
-        sep = "")
-    cat("hidden: ", paste(hidden, collapse = ", "), "    thresh: ", 
-        threshold, sprintf(eval(expression(text)), ""), i.rep, 
-        "/", rep, "    steps: ", sep = "")
-    if (lifesign == "full") 
-        lifesign <- sum(nchar(hidden)) + 2 * length(hidden) - 
-            2 + max(nchar(threshold)) + 2 * nchar(rep) + 41
-    return(lifesign)
+display <- function (hidden, threshold, rep, i.rep, lifesign) {
+  text <- paste("    rep: %", nchar(rep) - nchar(i.rep), "s", 
+                sep = "")
+  message("hidden: ", paste(hidden, collapse = ", "), "    thresh: ", 
+          threshold, sprintf(eval(expression(text)), ""), i.rep, 
+          "/", rep, "    steps: ", appendLF = FALSE)
+  if (lifesign == "full") 
+    lifesign <- sum(nchar(hidden)) + 2 * length(hidden) - 
+      2 + max(nchar(threshold)) + 2 * nchar(rep) + 41
+  return(lifesign)
 }
+
 calculate.neuralnet <-
 function (data, model.list, hidden, stepmax, rep, threshold, 
     learningrate.limit, learningrate.factor, lifesign, covariate, 
@@ -425,22 +424,20 @@ function (data, model.list, hidden, stepmax, rep, threshold,
             call. = F)
     if (lifesign != "none") {
         if (reached.threshold <= threshold) {
-            cat(rep(" ", (max(nchar(stepmax), nchar("stepmax")) - 
-                nchar(step))), step, sep = "")
-            cat("\terror: ", round(error, 5), rep(" ", 6 - (nchar(round(error, 
-                5)) - nchar(round(error, 0)))), sep = "")
+            message(rep(" ", (max(nchar(stepmax), nchar("stepmax")) - 
+                nchar(step))), step, appendLF = FALSE)
+            message("\terror: ", round(error, 5), rep(" ", 6 - (nchar(round(error, 
+                5)) - nchar(round(error, 0)))), appendLF = FALSE)
             if (!is.null(aic)) {
-                cat("\taic: ", round(aic, 5), rep(" ", 6 - (nchar(round(aic, 
-                  5)) - nchar(round(aic, 0)))), sep = "")
+                message("\taic: ", round(aic, 5), rep(" ", 6 - (nchar(round(aic, 
+                  5)) - nchar(round(aic, 0)))), appendLF = FALSE)
             }
             if (!is.null(bic)) {
-                cat("\tbic: ", round(bic, 5), rep(" ", 6 - (nchar(round(bic, 
-                  5)) - nchar(round(bic, 0)))), sep = "")
+                message("\tbic: ", round(bic, 5), rep(" ", 6 - (nchar(round(bic, 
+                  5)) - nchar(round(bic, 0)))), appendLF = FALSE)
             }
             time <- difftime(Sys.time(), time.start.local)
-            cat("\ttime: ", round(time, 2), " ", attr(time, "units"), 
-                sep = "")
-            cat("\n")
+            message("\ttime: ", round(time, 2), " ", attr(time, "units"))
         }
     }
     if (reached.threshold > threshold) 
@@ -604,9 +601,8 @@ function (weights, response, covariate, threshold, learningrate.limit,
         if (!is.character(lifesign) && step%%lifesign.step == 
             0) {
             text <- paste("%", nchar.stepmax, "s", sep = "")
-            cat(sprintf(eval(expression(text)), step), "\tmin thresh: ", 
-                min.reached.threshold, "\n", rep(" ", lifesign), 
-                sep = "")
+            message(sprintf(eval(expression(text)), step), "\tmin thresh: ", 
+                min.reached.threshold, "\n", rep(" ", lifesign), appendLF = FALSE)
             utils::flush.console()
         }
         if (algorithm == "rprop+") 
@@ -639,8 +635,7 @@ function (weights, response, covariate, threshold, learningrate.limit,
         step <- step + 1
     }
     if (lifesign != "none" && reached.threshold > threshold) {
-        cat("stepmax\tmin thresh: ", min.reached.threshold, "\n", 
-            sep = "")
+        message("stepmax\tmin thresh: ", min.reached.threshold)
     }
     return(list(weights = weights, step = as.integer(step), reached.threshold = reached.threshold, 
         net.result = result$net.result, neuron.deriv = result$neuron.deriv))
