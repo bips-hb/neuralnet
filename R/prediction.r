@@ -43,7 +43,7 @@ function (x, list.glm = NULL)
     predictions <- calculate.predictions(covariate = nn$covariate, 
         data.result = data.result, list.glm = list.glm, matrix = nn$result.matrix, 
         list.net.result = nn$net.result, model.list = nn$model.list)
-    if (type(nn$err.fct) == "ce" && all(data.result >= 0) && 
+    if (attr(nn$err.fct, "type") == "ce" && all(data.result >= 0) && 
         all(data.result <= 1)) 
         data.error <- sum(nn$err.fct(data.result, nn$response), 
             na.rm = T)

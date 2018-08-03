@@ -2,7 +2,7 @@ Package: neuralnet
 Type: Package
 Title: Training of Neural Networks
 Version: 1.4.0
-Date: 2018-07-11
+Date: 2018-08-03
 Authors@R: c(
     person(given="Stefan", family="Fritsch", role="aut"), 
     person(given="Frauke", family="Guenther", role=c("aut")),

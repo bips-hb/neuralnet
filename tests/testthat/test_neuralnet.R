@@ -8,7 +8,7 @@ pred2 <- predict(nn2, iris[, c("Petal.Length", "Petal.Width")])
 
 test_that("Fitting returns nn object with correct size", {
   expect_is(nn, "nn")
-  expect_length(nn, 13)
+  expect_length(nn, 14)
 })
 
 test_that("Prediction returns numeric with correct size", {

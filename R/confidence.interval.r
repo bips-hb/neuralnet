@@ -92,7 +92,7 @@ function (covariate, response, weights, err.fct, act.fct, exclude,
     linear.output) 
 {
     temp <- act.fct
-    if (type(act.fct) == "logistic") {
+    if (attr(act.fct, "type") == "logistic") {
         act.deriv.fct <- function(x) {
             act.fct(x) * (1 - act.fct(x))
         }
@@ -154,7 +154,7 @@ function (covariate, response, weights, err.fct, act.fct, exclude,
         warning("neuron.deriv2 contains NA; this might be caused by a wrong choice of 'act.fct'")
     }
     if (any(is.na(err.deriv)) || any(is.na(err.deriv2))) {
-        if (type(err.fct) == "ce") {
+        if (attr(err.fct, "type") == "ce") {
             one <- which(net.result == 1)
             if (length(one) > 0) {
                 for (i in 1:length(one)) {
