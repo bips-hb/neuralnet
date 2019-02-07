@@ -15,7 +15,7 @@
 #' 
 #' @export
 compute <- function(x, covariate, rep = 1) {
-  .Deprecated("predict", package = "neuralnet")
+  #.Deprecated("predict", package = "neuralnet")
   pred <- predict.nn(x, newdata = covariate, rep = rep, all.units = TRUE)
   
   # Create old format by adding intercept
