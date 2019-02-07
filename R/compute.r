@@ -16,6 +16,12 @@
 #' @export
 compute <- function(x, covariate, rep = 1) {
   .Deprecated("predict", package = "neuralnet")
-  pred <- predict.nn(x, newdata = covariate, rep = rep)
-  list(neurons = "Use predict() for unit prediction.", net.result = pred)
+  pred <- predict.nn(x, newdata = covariate, rep = rep, all.units = TRUE)
+  
+  # Create old format by adding intercept
+  for (i in 1:(length(pred) - 1)) {
+    pred[[i]] <- cbind(1, pred[[i]])
+  }
+  
+  list(neurons = pred[-length(pred)], net.result = pred[[length(pred)]])
 }

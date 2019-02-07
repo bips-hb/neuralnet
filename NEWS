@@ -1,4 +1,7 @@
 
+##### Version 1.44.2
+* Make compute() return the same as in previous versions
+
 ##### Version 1.44.1
 * Add support for dots in formula
 * Allow direct multiclass outcomes with factors
