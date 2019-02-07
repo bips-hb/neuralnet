@@ -38,7 +38,12 @@ predict.nn <- function(object, newdata, rep = 1, all.units = FALSE, ...) {
   num_hidden_layers <- length(weights) - 1
   
   # Init prediction with data, subset if necessary
-  pred <- as.matrix(newdata[, object$model.list$variables])
+  if (ncol(newdata) == length(object$model.list$variables)) {
+    pred <- as.matrix(newdata)
+  } else {
+    pred <- as.matrix(newdata[, object$model.list$variables])
+  }
+  
   
   # Init units if requested
   if (all.units) {
