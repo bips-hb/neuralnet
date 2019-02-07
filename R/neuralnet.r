@@ -246,9 +246,9 @@ neuralnet <-
   
   # Formula interface
   model.list <- list(response = attr(terms(as.formula(call("~", formula[[2]]))), "term.labels"), 
-                     variables = attr(terms(formula), "term.labels"))
+                     variables = attr(terms(formula, data = data), "term.labels"))
   response <- as.matrix(model.frame(as.formula(call("~", formula[[2]])), data))
-  covariate <- cbind(intercept = 1, as.matrix(model.frame(as.formula(call("~", formula[[3]])), data)))
+  covariate <- cbind(intercept = 1, as.matrix(data[, model.list$variables]))
   
   # Multiclass response
   if (is.character(response)) {

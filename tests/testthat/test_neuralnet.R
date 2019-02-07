@@ -3,28 +3,38 @@ context("neuralnet")
 
 nn <- neuralnet(Species == "setosa" ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
 nn2 <- neuralnet(Species == "setosa" ~ Petal.Length + Petal.Width, iris, hidden = c(3, 2), linear.output = FALSE)
-pred <- predict(nn, iris[, c("Petal.Length", "Petal.Width")])
-pred2 <- predict(nn2, iris[, c("Petal.Length", "Petal.Width")])
+
+if (!is.null(nn$weights)) {
+  pred <- predict(nn, iris[, c("Petal.Length", "Petal.Width")])
+}
+if (!is.null(nn2$weights)) {
+  pred2 <- predict(nn2, iris[, c("Petal.Length", "Petal.Width")])
+}
 
 test_that("Fitting returns nn object with correct size", {
+  skip_if(is.null(nn$weights))
   expect_is(nn, "nn")
   expect_length(nn, 14)
 })
 
 test_that("Prediction returns numeric with correct size", {
+  skip_if(is.null(nn$weights))
   expect_is(pred, "matrix")
   expect_equal(dim(pred), c(nrow(iris), 1))
 })
 
 test_that("predict() function returns list of correct size for unit prediction", {
+  skip_if(is.null(nn$weights))
   pred_all <- predict(nn, iris[, c("Petal.Length", "Petal.Width")], all.units = TRUE)
   expect_equal(length(pred_all), 3)
 
+  skip_if(is.null(nn2$weights))
   pred_all2 <- predict(nn2, iris[, c("Petal.Length", "Petal.Width")], all.units = TRUE)
   expect_equal(length(pred_all2), 4)
 })
 
 test_that("predict() works if more variables in data", {
+  skip_if(is.null(nn$weights))
   pred_all <- predict(nn, iris)
   expect_equal(dim(pred_all), c(nrow(iris), 1))
 })
@@ -63,3 +73,14 @@ test_that("Error if 'ce' error function used in non-binary outcome", {
                "Error function 'ce' only implemented for binary response\\.")
 })
 
+test_that("Dots in formula work", {
+  set.seed(42)
+  nn_dot <- neuralnet(Species ~ ., iris, linear.output = FALSE)
+  
+  set.seed(42)
+  nn_nodot <- neuralnet(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, iris, linear.output = FALSE)
+  
+  expect_equal(nn_dot$weights[[1]][[1]], nn_nodot$weights[[1]][[1]])
+  expect_equal(nn_dot$weights[[1]][[2]], nn_nodot$weights[[1]][[2]])
+  expect_equal(nn_dot$net.result[[1]], nn_nodot$net.result[[1]])
+})

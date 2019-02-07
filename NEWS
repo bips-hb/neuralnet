@@ -1,5 +1,6 @@
 
 ##### Version 1.4.1
+* Add support for dots in formula
 * Allow direct multiclass outcomes with factors
 
 ##### Version 1.4.0
