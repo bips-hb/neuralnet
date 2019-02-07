@@ -122,8 +122,7 @@
 #' \dontrun{plot(nn)}
 #' 
 #' # Multiclass classification
-#' nn <- neuralnet((Species == "setosa") + (Species == "versicolor") + (Species == "virginica")
-#'                  ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
+#' nn <- neuralnet(Species ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
 #' \dontrun{print(nn)}
 #' \dontrun{plot(nn)}
 #' 
@@ -247,9 +246,17 @@ neuralnet <-
   
   # Formula interface
   model.list <- list(response = attr(terms(as.formula(call("~", formula[[2]]))), "term.labels"), 
-                     variables = attr(terms(formula), "term.labels"))
+                     variables = attr(terms(formula, data = data), "term.labels"))
   response <- as.matrix(model.frame(as.formula(call("~", formula[[2]])), data))
-  covariate <- cbind(intercept = 1, as.matrix(model.frame(as.formula(call("~", formula[[3]])), data)))
+  covariate <- cbind(intercept = 1, as.matrix(data[, model.list$variables]))
+  
+  # Multiclass response
+  if (is.character(response)) {
+    class.names <- unique(response[, 1])
+    response <- model.matrix( ~ response[,1]-1) == 1
+    colnames(response) <- class.names
+    model.list$response <- class.names
+  }
   
   # Activation function
   if (is.function(act.fct)) {
