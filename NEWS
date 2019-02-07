@@ -1,3 +1,7 @@
+
+##### Version 1.4.1
+* Allow direct multiclass outcomes with factors
+
 ##### Version 1.4.0
 * New maintainer: Marvin N.Wright
 * Add a predict() function to replace compute()

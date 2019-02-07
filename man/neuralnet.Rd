@@ -5,12 +5,13 @@
 \alias{print.nn}
 \title{Training of neural networks}
 \usage{
-neuralnet(formula, data, hidden = 1, threshold = 0.01, stepmax = 1e+05,
-  rep = 1, startweights = NULL, learningrate.limit = NULL,
-  learningrate.factor = list(minus = 0.5, plus = 1.2), learningrate = NULL,
-  lifesign = "none", lifesign.step = 1000, algorithm = "rprop+",
-  err.fct = "sse", act.fct = "logistic", linear.output = TRUE,
-  exclude = NULL, constant.weights = NULL, likelihood = FALSE)
+neuralnet(formula, data, hidden = 1, threshold = 0.01,
+  stepmax = 1e+05, rep = 1, startweights = NULL,
+  learningrate.limit = NULL, learningrate.factor = list(minus = 0.5,
+  plus = 1.2), learningrate = NULL, lifesign = "none",
+  lifesign.step = 1000, algorithm = "rprop+", err.fct = "sse",
+  act.fct = "logistic", linear.output = TRUE, exclude = NULL,
+  constant.weights = NULL, likelihood = FALSE)
 }
 \arguments{
 \item{formula}{a symbolic description of the model to be fitted.}
@@ -124,8 +125,7 @@ nn <- neuralnet(Species == "setosa" ~ Petal.Length + Petal.Width, iris, linear.o
 \dontrun{plot(nn)}
 
 # Multiclass classification
-nn <- neuralnet((Species == "setosa") + (Species == "versicolor") + (Species == "virginica")
-                 ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
+nn <- neuralnet(Species ~ Petal.Length + Petal.Width, iris, linear.output = FALSE)
 \dontrun{print(nn)}
 \dontrun{plot(nn)}
 

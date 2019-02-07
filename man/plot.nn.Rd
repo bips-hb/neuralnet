@@ -7,10 +7,11 @@
 \method{plot}{nn}(x, rep = NULL, x.entry = NULL, x.out = NULL,
   radius = 0.15, arrow.length = 0.2, intercept = TRUE,
   intercept.factor = 0.4, information = TRUE, information.pos = 0.1,
-  col.entry.synapse = "black", col.entry = "black", col.hidden = "black",
-  col.hidden.synapse = "black", col.out = "black",
-  col.out.synapse = "black", col.intercept = "blue", fontsize = 12,
-  dimension = 6, show.weights = TRUE, file = NULL, ...)
+  col.entry.synapse = "black", col.entry = "black",
+  col.hidden = "black", col.hidden.synapse = "black",
+  col.out = "black", col.out.synapse = "black",
+  col.intercept = "blue", fontsize = 12, dimension = 6,
+  show.weights = TRUE, file = NULL, ...)
 }
 \arguments{
 \item{x}{an object of class \code{nn}}
