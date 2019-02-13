@@ -16,6 +16,14 @@ convert.activation.function <- function(fun) {
     deriv.fct <- function(x) {
       x * (1 - x)
     }
+  } else if (fun == "relu" || fun == "ReLu") {
+    fct <- function(x) {
+      x * (x > 0)
+    }
+    attr(fct, "type") <- "relu"
+    deriv.fct <- function(x) {
+      1 * (x > 0)
+    }
   } else {
     stop("Unknown function.", call. = FALSE)
   }

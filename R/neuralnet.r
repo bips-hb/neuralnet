@@ -235,7 +235,7 @@ neuralnet <-
   }
     
   # Activation function
-  if (!(is.function(act.fct) || act.fct %in% c("logistic", "tanh"))) {
+  if (!(is.function(act.fct) || act.fct %in% c("logistic", "tanh", "relu", "ReLu"))) {
     stop("Unknown activation function.", call. = FALSE)
   }
   

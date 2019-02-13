@@ -84,3 +84,8 @@ test_that("Dots in formula work", {
   expect_equal(nn_dot$weights[[1]][[2]], nn_nodot$weights[[1]][[2]])
   expect_equal(nn_dot$net.result[[1]], nn_nodot$net.result[[1]])
 })
+
+test_that("Works with ReLu activation", {
+  expect_silent(neuralnet(Species ~ ., iris, linear.output = FALSE, act.fct = "relu"))
+  expect_silent(neuralnet(Species ~ ., iris, linear.output = FALSE, act.fct = "ReLu"))
+})
