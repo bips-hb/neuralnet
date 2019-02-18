@@ -84,3 +84,18 @@ test_that("Dots in formula work", {
   expect_equal(nn_dot$weights[[1]][[2]], nn_nodot$weights[[1]][[2]])
   expect_equal(nn_dot$net.result[[1]], nn_nodot$net.result[[1]])
 })
+
+test_that("No error if replications don't converge", {
+  # One fail, one success (2 reps)
+  set.seed(1)
+  expect_warning(nn <- neuralnet(Species ~ ., iris, linear.output = FALSE, rep = 2, stepmax = 1e4))
+  expect_is(nn$net.result, "list")
+  expect_length(nn$net.result, 2)
+  expect_null(nn$net.result[[1]])
+  
+  # Both fail (2 reps)
+  set.seed(1)
+  expect_warning(nn <- neuralnet(Species ~ ., iris, linear.output = FALSE, rep = 2, stepmax = 10))
+  expect_null(nn$net.result)
+})
+

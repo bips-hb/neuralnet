@@ -1,4 +1,7 @@
 
+##### Version 1.44.3
+* Bug fixes
+
 ##### Version 1.44.2
 * Make compute() return the same as in previous versions
 * Soft-deprecate compute() for now
