@@ -302,13 +302,14 @@ neuralnet <-
                         constant.weights = constant.weights, likelihood = likelihood, 
                         learningrate.bp = learningrate)
   })
-  matrix <- sapply(list.result, function(x) {x$output.vector})
-  if (all(sapply(matrix, is.null))) {
+  null_reps <- sapply(list.result, function(x) {is.null(x$output.vector)})
+  matrix <- sapply(list.result[!null_reps], function(x) {x$output.vector})
+  if (is.matrix(matrix)) {
+    ncol.matrix <- ncol(matrix)
+  } else {
     list.result <- NULL
     matrix <- NULL
     ncol.matrix <- 0
-  } else {
-    ncol.matrix <- ncol(matrix)
   }
   
   # Warning if some replications did not converge
@@ -352,8 +353,9 @@ generate.output <- function(covariate, call, rep, threshold, matrix, startweight
     nn$generalized.weights <- lapply(list.result, function(x) {x$generalized.weights})
     nn$startweights <- lapply(list.result, function(x) {x$startweights})
     nn$result.matrix <- matrix
+    null_reps <- sapply(list.result, function(x) {is.null(x$output.vector)})
     rownames(nn$result.matrix) <- c(rownames(matrix)[rownames(matrix) != ""], 
-                                    get_weight_names(nn$weights[[1]], model.list))
+                                    get_weight_names(nn$weights[[which(!null_reps)[1]]], model.list))
   }
   
   class(nn) <- c("nn")
