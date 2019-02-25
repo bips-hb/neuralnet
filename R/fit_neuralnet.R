@@ -2,7 +2,8 @@ calculate.neuralnet <-
   function (data, model.list, hidden, stepmax, rep, threshold, 
             learningrate.limit, learningrate.factor, lifesign, covariate, 
             response, lifesign.step, startweights, algorithm, act.fct, 
-            act.deriv.fct, err.fct, err.deriv.fct, linear.output, likelihood, 
+            act.deriv.fct, output.act.fct, output.act.deriv.fct, 
+            err.fct, err.deriv.fct, linear.output, likelihood, 
             exclude, constant.weights, learningrate.bp) 
   {
     time.start.local <- Sys.time()
@@ -16,7 +17,9 @@ calculate.neuralnet <-
                     response = response, covariate = covariate, learningrate.limit = learningrate.limit, 
                     learningrate.factor = learningrate.factor, stepmax = stepmax, 
                     lifesign = lifesign, lifesign.step = lifesign.step, act.fct = act.fct, 
-                    act.deriv.fct = act.deriv.fct, err.fct = err.fct, err.deriv.fct = err.deriv.fct, 
+                    act.deriv.fct = act.deriv.fct, output.act.fct = output.act.fct, 
+                    output.act.deriv.fct = output.act.deriv.fct,
+                    err.fct = err.fct, err.deriv.fct = err.deriv.fct, 
                     algorithm = algorithm, linear.output = linear.output, 
                     exclude = exclude, learningrate.bp = learningrate.bp)
     startweights <- weights
@@ -175,7 +178,7 @@ generate.startweights <-
 rprop <-
   function (weights, response, covariate, threshold, learningrate.limit, 
             learningrate.factor, stepmax, lifesign, lifesign.step, act.fct, 
-            act.deriv.fct, err.fct, err.deriv.fct, algorithm, linear.output, 
+            act.deriv.fct, output.act.fct, output.act.deriv.fct, err.fct, err.deriv.fct, algorithm, linear.output, 
             exclude, learningrate.bp) 
   {
     step <- 1
@@ -188,9 +191,12 @@ rprop <-
     gradients.old <- as.vector(matrix(0, nrow = 1, ncol = length.unlist))
     if (is.null(exclude)) 
       exclude <- length(unlist(weights)) + 1
-    if (attr(act.fct, "type") == "tanh" || attr(act.fct, "type") == "logistic") 
+    if (attr(act.fct, "type") == "tanh" || attr(act.fct, "type") == "logistic" || attr(act.fct, "type") == "relu") 
       special <- TRUE
     else special <- FALSE
+    if (attr(output.act.fct, "type") == "tanh" || attr(output.act.fct, "type") == "logistic" || attr(output.act.fct, "type") == "relu") 
+      output.special <- TRUE
+    else output.special <- FALSE
     if (linear.output) {
       output.act.fct <- function(x) {
         x
@@ -206,12 +212,12 @@ rprop <-
         }
         linear.output <- TRUE
       }
-      output.act.fct <- act.fct
-      output.act.deriv.fct <- act.deriv.fct
+      #output.act.fct <- act.fct
+      #output.act.deriv.fct <- act.deriv.fct
     }
     result <- compute.net(weights, length.weights, covariate = covariate, 
                           act.fct = act.fct, act.deriv.fct = act.deriv.fct, output.act.fct = output.act.fct, 
-                          output.act.deriv.fct = output.act.deriv.fct, special)
+                          output.act.deriv.fct = output.act.deriv.fct, special, output.special)
     err.deriv <- err.deriv.fct(result$net.result, response)
     gradients <- calculate.gradients(weights = weights, length.weights = length.weights, 
                                      neurons = result$neurons, neuron.deriv = result$neuron.deriv, 
@@ -244,7 +250,7 @@ rprop <-
       result <- compute.net(weights, length.weights, covariate = covariate, 
                             act.fct = act.fct, act.deriv.fct = act.deriv.fct, 
                             output.act.fct = output.act.fct, output.act.deriv.fct = output.act.deriv.fct, 
-                            special)
+                            special, output.special)
       err.deriv <- err.deriv.fct(result$net.result, response)
       gradients <- calculate.gradients(weights = weights, length.weights = length.weights, 
                                        neurons = result$neurons, neuron.deriv = result$neuron.deriv, 
@@ -263,7 +269,7 @@ rprop <-
   }
 compute.net <-
   function (weights, length.weights, covariate, act.fct, act.deriv.fct, 
-            output.act.fct, output.act.deriv.fct, special) 
+            output.act.fct, output.act.deriv.fct, special, output.special) 
   {
     neuron.deriv <- NULL
     neurons <- list(covariate)
@@ -280,7 +286,7 @@ compute.net <-
       neuron.deriv <- list(neuron.deriv)
     temp <- neurons[[length.weights]] %*% weights[[length.weights]]
     net.result <- output.act.fct(temp)
-    if (special) 
+    if (output.special) 
       neuron.deriv[[length.weights]] <- output.act.deriv.fct(net.result)
     else neuron.deriv[[length.weights]] <- output.act.deriv.fct(temp)
     if (any(is.na(neuron.deriv))) 

@@ -10,8 +10,9 @@ neuralnet(formula, data, hidden = 1, threshold = 0.01,
   learningrate.limit = NULL, learningrate.factor = list(minus = 0.5,
   plus = 1.2), learningrate = NULL, lifesign = "none",
   lifesign.step = 1000, algorithm = "rprop+", err.fct = "sse",
-  act.fct = "logistic", linear.output = TRUE, exclude = NULL,
-  constant.weights = NULL, likelihood = FALSE)
+  act.fct = "logistic", output.act.fct = "logistic",
+  linear.output = TRUE, exclude = NULL, constant.weights = NULL,
+  likelihood = FALSE)
 }
 \arguments{
 \item{formula}{a symbolic description of the model to be fitted.}
@@ -63,10 +64,13 @@ of squared errors and the cross-entropy can be used.}
 
 \item{act.fct}{a differentiable function that is used for smoothing the
 result of the cross product of the covariate or neurons and the weights.
-Additionally the strings, 'logistic' and 'tanh' are possible for the
-logistic function and tangent hyperbolicus.}
+Additionally the strings, 'logistic', 'tanh' and 'relu' are possible for the
+logistic function, tangent hyperbolicus and rectified linear unit.}
 
-\item{linear.output}{logical. If act.fct should not be applied to the output
+\item{output.act.fct}{activation function used in the output layer 
+(if \code{linear.output = FALSE}). Use same functions/strings as in \code{act.fct}.}
+
+\item{linear.output}{logical. If output.act.fct should not be applied to the output
 neurons set linear output to TRUE, otherwise to FALSE.}
 
 \item{exclude}{a vector or a matrix specifying the weights, that are
