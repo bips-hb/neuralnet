@@ -50,9 +50,11 @@
 #' of squared errors and the cross-entropy can be used.
 #' @param act.fct a differentiable function that is used for smoothing the
 #' result of the cross product of the covariate or neurons and the weights.
-#' Additionally the strings, 'logistic' and 'tanh' are possible for the
-#' logistic function and tangent hyperbolicus.
-#' @param linear.output logical. If act.fct should not be applied to the output
+#' Additionally the strings, 'logistic', 'tanh' and 'relu' are possible for the
+#' logistic function, tangent hyperbolicus and rectified linear unit.
+#' @param output.act.fct activation function used in the output layer 
+#' (if \code{linear.output = FALSE}). Use same functions/strings as in \code{act.fct}.
+#' @param linear.output logical. If output.act.fct should not be applied to the output
 #' neurons set linear output to TRUE, otherwise to FALSE.
 #' @param exclude a vector or a matrix specifying the weights, that are
 #' excluded from the calculation. If given as a vector, the exact positions of
@@ -140,7 +142,7 @@ neuralnet <-
             rep = 1, startweights = NULL, learningrate.limit = NULL,
             learningrate.factor = list(minus = 0.5, plus = 1.2), learningrate = NULL, 
             lifesign = "none", lifesign.step = 1000, algorithm = "rprop+", 
-            err.fct = "sse", act.fct = "logistic", linear.output = TRUE,
+            err.fct = "sse", act.fct = "logistic", output.act.fct = "logistic", linear.output = TRUE,
             exclude = NULL, constant.weights = NULL, likelihood = FALSE) {
     
   # Save call
@@ -235,8 +237,11 @@ neuralnet <-
   }
     
   # Activation function
-  if (!(is.function(act.fct) || act.fct %in% c("logistic", "tanh"))) {
+  if (!(is.function(act.fct) || act.fct %in% c("logistic", "tanh", "relu", "ReLu"))) {
     stop("Unknown activation function.", call. = FALSE)
+  }
+  if (!(is.function(output.act.fct) || output.act.fct %in% c("logistic", "tanh", "relu", "ReLu"))) {
+    stop("Unknown output activation function.", call. = FALSE)
   }
   
   # Error function
@@ -266,6 +271,16 @@ neuralnet <-
     converted.fct <- convert.activation.function(act.fct)
     act.fct <- converted.fct$fct
     act.deriv.fct <- converted.fct$deriv.fct
+  }
+  
+  # Output activation function
+  if (is.function(output.act.fct)) {
+    output.act.deriv.fct <- Deriv::Deriv(output.act.fct)
+    attr(output.act.fct, "type") <- "function"
+  } else {
+    converted.fct <- convert.activation.function(output.act.fct)
+    output.act.fct <- converted.fct$fct
+    output.act.deriv.fct <- converted.fct$deriv.fct
   }
   
   # Error function
@@ -298,6 +313,7 @@ neuralnet <-
                         startweights = startweights, algorithm = algorithm, 
                         err.fct = err.fct, err.deriv.fct = err.deriv.fct, 
                         act.fct = act.fct, act.deriv.fct = act.deriv.fct, 
+                        output.act.fct = output.act.fct, output.act.deriv.fct = output.act.deriv.fct,
                         rep = i, linear.output = linear.output, exclude = exclude, 
                         constant.weights = constant.weights, likelihood = likelihood, 
                         learningrate.bp = learningrate)
@@ -320,7 +336,7 @@ neuralnet <-
       
   # Return output
   generate.output(covariate, call, rep, threshold, matrix, 
-      startweights, model.list, response, err.fct, act.fct, 
+      startweights, model.list, response, err.fct, act.fct, output.act.fct,
       data, list.result, linear.output, exclude)
 }
 
@@ -340,11 +356,11 @@ display <- function (hidden, threshold, rep, i.rep, lifesign) {
 
 # Generate output object
 generate.output <- function(covariate, call, rep, threshold, matrix, startweights, 
-                            model.list, response, err.fct, act.fct, data, list.result, 
-                            linear.output, exclude) {
+                            model.list, response, err.fct, act.fct, output.act.fct, 
+                            data, list.result, linear.output, exclude) {
   
   nn <- list(call = call, response = response, covariate = covariate[, -1, drop = FALSE], 
-             model.list = model.list, err.fct = err.fct, act.fct = act.fct, 
+             model.list = model.list, err.fct = err.fct, act.fct = act.fct, output.act.fct = output.act.fct,
              linear.output = linear.output, data = data, exclude = exclude)
   
   if (!is.null(matrix)) {

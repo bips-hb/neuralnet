@@ -65,7 +65,7 @@ predict.nn <- function(object, newdata, rep = 1, all.units = FALSE, ...) {
   # Output layer: Only apply activation function if non-linear output
   pred <- cbind(1, pred) %*% weights[[num_hidden_layers + 1]]
   if (!object$linear.output) {
-    pred <- object$act.fct(pred)
+    pred <- object$output.act.fct(pred)
   }
   
   # Save unit outputs if requested
