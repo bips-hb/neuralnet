@@ -336,7 +336,7 @@ neuralnet <-
       
   # Return output
   generate.output(covariate, call, rep, threshold, matrix, 
-      startweights, model.list, response, err.fct, act.fct, 
+      startweights, model.list, response, err.fct, act.fct, output.act.fct,
       data, list.result, linear.output, exclude)
 }
 
@@ -356,11 +356,11 @@ display <- function (hidden, threshold, rep, i.rep, lifesign) {
 
 # Generate output object
 generate.output <- function(covariate, call, rep, threshold, matrix, startweights, 
-                            model.list, response, err.fct, act.fct, data, list.result, 
-                            linear.output, exclude) {
+                            model.list, response, err.fct, act.fct, output.act.fct, 
+                            data, list.result, linear.output, exclude) {
   
   nn <- list(call = call, response = response, covariate = covariate[, -1, drop = FALSE], 
-             model.list = model.list, err.fct = err.fct, act.fct = act.fct, 
+             model.list = model.list, err.fct = err.fct, act.fct = act.fct, output.act.fct = output.act.fct,
              linear.output = linear.output, data = data, exclude = exclude)
   
   if (!is.null(matrix)) {

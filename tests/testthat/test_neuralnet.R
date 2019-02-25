@@ -18,7 +18,7 @@ if (!is.null(nn2$weights)) {
 test_that("Fitting returns nn object with correct size", {
   skip_if(is.null(nn$weights))
   expect_is(nn, "nn")
-  expect_length(nn, 14)
+  expect_length(nn, 15)
 })
 
 test_that("Prediction returns numeric with correct size", {
