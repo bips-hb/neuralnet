@@ -1,4 +1,8 @@
 
+##### Version 1.44.5
+* Allow prediction with NA weights (set to 0 as in old version)
+* Fix prediction for networks grown with older versions
+
 ##### Version 1.44.4
 * Add ReLu activation function
 
