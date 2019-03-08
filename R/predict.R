@@ -37,8 +37,15 @@ predict.nn <- function(object, newdata, rep = 1, all.units = FALSE, ...) {
   weights <- object$weights[[rep]]
   num_hidden_layers <- length(weights) - 1
   
+  # Set NA weights to 0
+  for (i in 1:length(weights)) {
+    if (any(is.na(weights[[i]]))) {
+      weights[[i]][is.na(weights[[i]])] <- 0
+    }
+  }
+    
   # Init prediction with data, subset if necessary
-  if (ncol(newdata) == length(object$model.list$variables)) {
+  if (ncol(newdata) == length(object$model.list$variables) | is.null(object$model.list)) {
     pred <- as.matrix(newdata)
   } else {
     pred <- as.matrix(newdata[, object$model.list$variables])
@@ -65,7 +72,12 @@ predict.nn <- function(object, newdata, rep = 1, all.units = FALSE, ...) {
   # Output layer: Only apply activation function if non-linear output
   pred <- cbind(1, pred) %*% weights[[num_hidden_layers + 1]]
   if (!object$linear.output) {
-    pred <- object$output.act.fct(pred)
+    if (is.null(object$output.act.fct)) {
+      # Networks from version <1.44.4, no separate output activation
+      pred <- object$act.fct(pred)
+    } else {
+      pred <- object$output.act.fct(pred)
+    }
   }
   
   # Save unit outputs if requested
