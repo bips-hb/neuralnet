@@ -286,7 +286,7 @@ neuralnet <-
   # Error function
   if (is.function(err.fct)) {
     attr(err.fct, "type") <- "function"
-    err.deriv.fct <- Deriv::Deriv(err.fct)
+    err.deriv.fct <- Deriv::Deriv(err.fct, x = "x")
   } else {
     converted.fct <- convert.error.function(err.fct)
     err.fct <- converted.fct$fct
