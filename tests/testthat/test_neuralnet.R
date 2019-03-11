@@ -71,6 +71,19 @@ test_that("Same result with custom activation function", {
   expect_equal(nn_custom$result.matrix, nn_default$result.matrix)
 })
 
+test_that("Same result with custom error function", {
+  set.seed(10)
+  nn_custom <- neuralnet(Species == "setosa" ~ Petal.Length + Petal.Width, dat, 
+                         linear.output = FALSE, err.fct = function(x, y) {1/2 * (y - x)^2})
+  
+  set.seed(10)
+  nn_default <- neuralnet(Species == "setosa" ~ Petal.Length + Petal.Width, dat, 
+                          linear.output = FALSE, err.fct = "sse")
+  
+  expect_equal(nn_custom$net.result, nn_default$net.result)
+  expect_equal(nn_custom$result.matrix, nn_default$result.matrix)
+})
+
 test_that("Error if 'ce' error function used in non-binary outcome", {
   expect_error(neuralnet(Sepal.Length ~ Petal.Length + Petal.Width, 
                          dat, linear.output = TRUE, err.fct = "ce"), 
