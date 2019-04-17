@@ -257,10 +257,9 @@ neuralnet <-
   
   # Multiclass response
   if (is.character(response)) {
-    class.names <- unique(response[, 1])
-    response <- model.matrix( ~ response[,1]-1) == 1
-    colnames(response) <- class.names
-    model.list$response <- class.names
+    response <- model.matrix( ~ response[, 1] - 1) == 1
+    colnames(response) <- gsub("response\\[, 1\\]", "", colnames(response))
+    model.list$response <- colnames(response)
   }
   
   # Activation function
