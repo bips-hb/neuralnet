@@ -65,7 +65,7 @@
 #' are excluded from the training process and treated as fix.
 #' @param likelihood logical. If the error function is equal to the negative
 #' log-likelihood function, the information criteria AIC and BIC will be
-#' calculated. Furthermore the usage of confidence.interval is meaningfull.
+#' calculated. Furthermore the usage of confidence.interval is meaningful.
 #' 
 #' @return \code{neuralnet} returns an object of class \code{nn}.  An object of
 #' class \code{nn} is a list containing at most the following components:
